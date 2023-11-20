@@ -1,0 +1,2 @@
+# esp32_desktop_assistant
+esp32配合lvgl实现的简单桌面助手
