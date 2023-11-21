@@ -1,0 +1,5 @@
+build/
+.vscode/
+components/
+components/lvgl/
+components/lvgl_esp32_drivers/
