@@ -1,7 +1,7 @@
-# esp32_desktop_assistant
+# ESP32桌面助手
 esp32配合lvgl实现的简单桌面助手
 
-需要以下组件
+需要添加以下组件
 ```
 idf.py add-dependency "lvgl/lvgl^8.2.0"
 
