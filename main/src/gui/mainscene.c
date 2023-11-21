@@ -46,7 +46,7 @@ void Task_MainScene(void * arg){
     lv_obj_set_style_radius(obj_statusBar, 0, 0);
     lv_obj_set_size(obj_statusBar,lv_disp_get_hor_res(NULL),lv_disp_get_ver_res(NULL)/8);
     lv_obj_clear_flag(obj_statusBar, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_pos(obj_statusBar,-5,-5);
+    lv_obj_set_pos(obj_statusBar,-10,-10);
 
     lv_obj_t* label_wifiLogo=lv_label_create(obj_statusBar);
     lv_label_set_text(label_wifiLogo,LV_SYMBOL_WIFI);
