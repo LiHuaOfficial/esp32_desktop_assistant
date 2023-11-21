@@ -1,6 +1,12 @@
 # ESP32桌面助手
 esp32配合lvgl实现的简单桌面助手
 
+目前实现的功能
++ 主页面（未添加内容）  
++ 设置界面
+    + 连接Wifi
+
+
 需要添加以下组件
 ```
 idf.py add-dependency "lvgl/lvgl^8.2.0"
