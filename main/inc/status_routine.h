@@ -20,8 +20,9 @@ extern "C"{
 可能还会包括一些杂项
 */
 
-#define ROUTINE_BIT_WIFI_SCANNING BIT0
-#define ROUTINE_BIT_WIFI_CONNECTED BIT1//更新主界面状态栏
+#define ROUTINE_BIT_WIFI_SCAN_START BIT0
+#define ROUTINE_BIT_WIFI_CONNECT_SUCCESS BIT1//更新主界面状态栏
+#define ROUTINE_BIT_WIFI_CONNECT_FAILED BIT2
 
 typedef struct
 {   
@@ -35,7 +36,7 @@ typedef struct
     
 } Common_status;
 
-extern EventGroupHandle_t eventGroup_routine; 
+extern EventGroupHandle_t eventGroup_note; 
 extern Common_status common_status;
 
 void Task_Routine(void * arg);

@@ -133,7 +133,8 @@ static void Handler_WifiEvent(void* arg, esp_event_base_t event_base,
                     ESP_LOGE(TAG, "Fail after n tries");
                     xSemaphoreTake(xGuiSemaphore,portMAX_DELAY);
                     lv_label_set_text(common_status.label_wifiStatus,"No Wifi");
-                    xSemaphoreGive(xGuiSemaphore); 
+                    xSemaphoreGive(xGuiSemaphore);
+                    xEventGroupSetBits(eventGroup_note,ROUTINE_BIT_WIFI_CONNECT_FAILED);
                 }
             }
 
@@ -153,16 +154,19 @@ static void Handler_WifiEvent(void* arg, esp_event_base_t event_base,
             
             common_status.wifi=true;
             common_status.menu_wifi_switch=true;
-            xEventGroupSetBits(eventGroup_routine,ROUTINE_BIT_WIFI_CONNECTED);
+
+            xEventGroupSetBits(eventGroup_note,ROUTINE_BIT_WIFI_CONNECT_SUCCESS);
         }
     }
 }
 
 wifi_ap_record_t ap_info[SCAN_LIST_SIZE];
 void Task_WifiScan(void* args){
+    xEventGroupSetBits(eventGroup_note,ROUTINE_BIT_WIFI_SCAN_START);
+
     lv_obj_t* subMenu=args;
 
-    static uint16_t number = SCAN_LIST_SIZE;
+    uint16_t number = SCAN_LIST_SIZE;
     
     uint16_t ap_count = 0;
 
