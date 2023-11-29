@@ -49,7 +49,6 @@ void Task_WifiInit(void* arg){
 
     wifi_init_config_t cfg_wifiInit=WIFI_INIT_CONFIG_DEFAULT();
     
-
     ESP_ERROR_CHECK(esp_wifi_init(&cfg_wifiInit));
 
     //向默认循环中注册事件

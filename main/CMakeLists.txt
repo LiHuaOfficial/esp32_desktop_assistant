@@ -3,7 +3,7 @@
 
 file(GLOB_RECURSE c_srcs 
     "${PROJECT_DIR}/main/*.c"
-    "${PROJECT_DIR}/main/scr/*.c")
+    "${PROJECT_DIR}/main/src/*.c")
 
 MESSAGE(STATUS "in c_srcs " ${c_srcs})
 

@@ -37,7 +37,7 @@ void Task_MainScene(void * arg){
 
     lv_obj_add_event_cb(btn_setup,MenuEnter_Handler,LV_EVENT_CLICKED,NULL);
 
-    
+    //Wifi状态栏
     lv_obj_t* obj_statusBar=lv_obj_create(mainScene);
     lv_obj_set_align(obj_statusBar,LV_ALIGN_TOP_LEFT);
 
