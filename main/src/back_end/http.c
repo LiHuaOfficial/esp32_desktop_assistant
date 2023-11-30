@@ -35,13 +35,13 @@ void Http_get_from_url()
     char response_buffer[HTTP_OUT_PUT_BUFFER_SIZE];
     
     esp_http_client_config_t cfg_http_client={
-        .url="http://httpbin.org/get",
+        .url="https://api.seniverse.com/v3/weather/now.json?key=SJvAOXfRZ1pDGsd3D&location=37.75:112.72&language=en&unit=c",
         .event_handler=Event_Handler_Http,
         .user_data=response_buffer,
         .disable_auto_redirect=true,
     };
     esp_http_client_handle_t handle_http_client=esp_http_client_init(&cfg_http_client);
-
+    
     if(esp_http_client_perform(handle_http_client)==ESP_OK){
         ESP_LOGI(TAG, "HTTP GET Status = %d, content_length = %"PRIu64,
                 esp_http_client_get_status_code(handle_http_client),
@@ -52,6 +52,7 @@ void Http_get_from_url()
     //ESP_LOG_BUFFER_HEX(TAG,response_buffer,strlen(response_buffer));
     printf("\n%s\n",response_buffer);
     esp_http_client_cleanup(handle_http_client);
+
 }
 
 esp_err_t Event_Handler_Http(esp_http_client_event_t* e)
