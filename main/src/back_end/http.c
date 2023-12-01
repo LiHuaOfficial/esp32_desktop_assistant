@@ -9,6 +9,7 @@
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/semphr.h"
 
 #include "esp_log.h"
 #include "esp_event.h"
@@ -21,6 +22,9 @@
 
 #define TAG "http"
 #define MIN(X,Y) (((X)>(Y))?(X):(Y))
+
+extern SemaphoreHandle_t xGuiSemaphore;
+
 static void Http_get_from_url();
 static esp_err_t Event_Handler_Http(esp_http_client_event_t *evt);
 
@@ -78,10 +82,12 @@ void Http_get_from_url()
         cJSON* json_obj_text=cJSON_GetObjectItem(json_obj_now,"text");
         cJSON* json_obj_temperature=cJSON_GetObjectItem(json_obj_now,"temperature");
 
+        xSemaphoreTake(xGuiSemaphore,portMAX_DELAY);
         lv_label_set_text_fmt(lv_obj_get_child(obj_weather,0),"City:   %s",json_obj_name->valuestring);
         lv_label_set_text_fmt(lv_obj_get_child(obj_weather,1),"Weather:%s",json_obj_text->valuestring);
         lv_label_set_text_fmt(lv_obj_get_child(obj_weather,2),"Temp:   %s°C",json_obj_temperature->valuestring);
-        
+        xSemaphoreGive(xGuiSemaphore);
+
         cJSON_Delete(resJSON);
         
     }
