@@ -54,6 +54,7 @@ void Task_MainScene(void * arg){
     lv_obj_align_to(common_status.label_wifiStatus,label_wifiLogo,LV_ALIGN_LEFT_MID,17,0);
 
     obj_weather=lv_obj_create(mainScene);
+    lv_obj_clear_flag(obj_weather,LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_pos(obj_weather,0,20);
     lv_obj_t* label_place=lv_label_create(obj_weather);
     lv_obj_t* label_weather=lv_label_create(obj_weather);
@@ -61,9 +62,13 @@ void Task_MainScene(void * arg){
     lv_obj_t* label_temperature=lv_label_create(obj_weather);
     lv_obj_align_to(label_temperature,label_weather,LV_ALIGN_OUT_BOTTOM_MID,0,0);
 
-    lv_label_set_text(label_place,"No data");
-    lv_label_set_text(label_weather,"No data");
-    lv_label_set_text(label_temperature,"No data");
+    lv_label_set_long_mode(label_place,LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_label_set_long_mode(label_weather,LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_label_set_long_mode(label_temperature,LV_LABEL_LONG_SCROLL_CIRCULAR);
+
+    lv_label_set_text(label_place,      "City:   None");
+    lv_label_set_text(label_weather,    "Weather:None");
+    lv_label_set_text(label_temperature,"Temp:   None");
     xSemaphoreGive(xGuiSemaphore);
 
     vTaskDelete(NULL);

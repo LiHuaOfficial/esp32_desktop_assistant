@@ -78,9 +78,9 @@ void Http_get_from_url()
         cJSON* json_obj_text=cJSON_GetObjectItem(json_obj_now,"text");
         cJSON* json_obj_temperature=cJSON_GetObjectItem(json_obj_now,"temperature");
 
-        lv_label_set_text_fmt(lv_obj_get_child(obj_weather,0),"City:%s",json_obj_name->valuestring);
+        lv_label_set_text_fmt(lv_obj_get_child(obj_weather,0),"City:   %s",json_obj_name->valuestring);
         lv_label_set_text_fmt(lv_obj_get_child(obj_weather,1),"Weather:%s",json_obj_text->valuestring);
-        lv_label_set_text_fmt(lv_obj_get_child(obj_weather,2),"Temp:%s",json_obj_temperature->valuestring);
+        lv_label_set_text_fmt(lv_obj_get_child(obj_weather,2),"Temp:   %s°C",json_obj_temperature->valuestring);
         
         cJSON_Delete(resJSON);
         
