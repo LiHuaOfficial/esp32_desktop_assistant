@@ -3,11 +3,13 @@
 
 file(GLOB_RECURSE c_srcs 
     "${PROJECT_DIR}/main/*.c"
-    "${PROJECT_DIR}/main/src/*.c")
+    "${PROJECT_DIR}/main/src/*.c"
+    "${PROJECT_DIR}/main/src/back_end/*.c")
 
 MESSAGE(STATUS "in c_srcs " ${c_srcs})
 
-idf_component_register(SRCS ${c_srcs}#应当以变量形式使用！
+
+idf_component_register(SRCS ${c_srcs} #应当以变量形式使用！
                     INCLUDE_DIRS "." "inc")
 
 #-----------------------------------------------------------------#

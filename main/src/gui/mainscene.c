@@ -15,7 +15,7 @@ extern lv_obj_t* setupScene;
 
 extern lv_indev_t * indev_keypad;
 
-//lv_style_t style_menuObj;
+lv_obj_t* obj_weather;
 
 static void MenuEnter_Handler(lv_event_t* e);
 
@@ -24,9 +24,6 @@ static void MenuEnter_Handler(lv_event_t* e);
 //调用所有lv_...函数都应保证互斥访问
 void Task_MainScene(void * arg){
     xSemaphoreTake(xGuiSemaphore,portMAX_DELAY);
-
-
-
 
     lv_obj_t* btn_setup = lv_btn_create(mainScene);
     //lv_obj_add_style(btn_setup,&style_menuObj,LV_PART_MAIN);
@@ -56,6 +53,17 @@ void Task_MainScene(void * arg){
     lv_label_set_text(common_status.label_wifiStatus,"No Wifi");
     lv_obj_align_to(common_status.label_wifiStatus,label_wifiLogo,LV_ALIGN_LEFT_MID,17,0);
 
+    obj_weather=lv_obj_create(mainScene);
+    lv_obj_set_pos(obj_weather,0,20);
+    lv_obj_t* label_place=lv_label_create(obj_weather);
+    lv_obj_t* label_weather=lv_label_create(obj_weather);
+    lv_obj_align_to(label_weather,label_place,LV_ALIGN_OUT_BOTTOM_MID,0,0);
+    lv_obj_t* label_temperature=lv_label_create(obj_weather);
+    lv_obj_align_to(label_temperature,label_weather,LV_ALIGN_OUT_BOTTOM_MID,0,0);
+
+    lv_label_set_text(label_place,"No data");
+    lv_label_set_text(label_weather,"No data");
+    lv_label_set_text(label_temperature,"No data");
     xSemaphoreGive(xGuiSemaphore);
 
     vTaskDelete(NULL);

@@ -5,6 +5,8 @@
 
 #include "status_routine.h"
 
+#include "lvgl.h"
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
@@ -13,6 +15,9 @@
 #include "esp_netif.h"
 #include "esp_http_client.h"
 #include "esp_system.h"
+
+#include "cJSON.h"
+#include "mainscene.h"
 
 #define TAG "http"
 #define MIN(X,Y) (((X)>(Y))?(X):(Y))
@@ -42,17 +47,44 @@ void Http_get_from_url()
     };
     esp_http_client_handle_t handle_http_client=esp_http_client_init(&cfg_http_client);
     
+    int64_t contentLenth;
     if(esp_http_client_perform(handle_http_client)==ESP_OK){
         ESP_LOGI(TAG, "HTTP GET Status = %d, content_length = %"PRIu64,
                 esp_http_client_get_status_code(handle_http_client),
-                esp_http_client_get_content_length(handle_http_client));        
+                contentLenth=esp_http_client_get_content_length(handle_http_client));        
     }else{
         ESP_LOGE(TAG,"Http GET request failed");
+        contentLenth=0;
     }
     //ESP_LOG_BUFFER_HEX(TAG,response_buffer,strlen(response_buffer));
-    printf("\n%s\n",response_buffer);
+    for(int64_t i=0;i<contentLenth;i++){
+        printf("%c",response_buffer[i]);
+    }
     esp_http_client_cleanup(handle_http_client);
 
+    //解析Json文件
+    if(contentLenth){
+        cJSON* resJSON=cJSON_ParseWithLength(response_buffer,contentLenth);
+        
+        cJSON* json_array=cJSON_GetObjectItem(resJSON,"results");
+        cJSON* json_arrayItem=cJSON_GetArrayItem(json_array,0);
+        cJSON* json_obj_location=cJSON_GetObjectItem(json_arrayItem,"location");
+        cJSON* json_obj_now=cJSON_GetObjectItem(json_arrayItem,"now");
+
+        //从Location中取城市名
+        cJSON* json_obj_name=cJSON_GetObjectItem(json_obj_location,"name");
+
+        //从now中取得天气&温度
+        cJSON* json_obj_text=cJSON_GetObjectItem(json_obj_now,"text");
+        cJSON* json_obj_temperature=cJSON_GetObjectItem(json_obj_now,"temperature");
+
+        lv_label_set_text_fmt(lv_obj_get_child(obj_weather,0),"City:%s",json_obj_name->valuestring);
+        lv_label_set_text_fmt(lv_obj_get_child(obj_weather,1),"Weather:%s",json_obj_text->valuestring);
+        lv_label_set_text_fmt(lv_obj_get_child(obj_weather,2),"Temp:%s",json_obj_temperature->valuestring);
+        
+        cJSON_Delete(resJSON);
+        
+    }
 }
 
 esp_err_t Event_Handler_Http(esp_http_client_event_t* e)

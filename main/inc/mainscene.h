@@ -5,6 +5,9 @@
 extern "C"{
 #endif
 
+#include "lvgl.h"
+
+extern lv_obj_t* obj_weather;
 void Task_MainScene(void * arg);
 
 #ifdef __cplusplus
