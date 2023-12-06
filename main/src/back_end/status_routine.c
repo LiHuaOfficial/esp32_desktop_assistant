@@ -31,7 +31,7 @@ void Task_Routine(void *arg)
     xTaskCreate(Task_MyEventHandle,"MyEvent",4096,NULL,configMAX_PRIORITIES,NULL);
 
     //需要定时处理的操作
-    xTaskCreate(Task_Http,"Http",4096*2,NULL,5,NULL);
+    xTaskCreate(Task_Http,"Http",4096*3,NULL,5,NULL);
 
     vTaskDelete(NULL);
 }

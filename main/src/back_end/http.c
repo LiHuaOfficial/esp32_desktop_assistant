@@ -52,10 +52,14 @@ void Http_get_from_url()
     esp_http_client_handle_t handle_http_client=esp_http_client_init(&cfg_http_client);
     
     int64_t contentLenth;
-    if(esp_http_client_perform(handle_http_client)==ESP_OK){
-        ESP_LOGI(TAG, "HTTP GET Status = %d, content_length = %"PRIu64,
-                esp_http_client_get_status_code(handle_http_client),
-                contentLenth=esp_http_client_get_content_length(handle_http_client));        
+    int statusCode=0;
+    if(esp_http_client_perform(handle_http_client)==ESP_OK){//可能是NULL导致崩溃？
+        vTaskDelay(pdMS_TO_TICKS(100));//似乎解决了get_status_code导致崩溃的问题
+        
+        statusCode=esp_http_client_get_status_code(handle_http_client);
+        contentLenth=esp_http_client_get_content_length(handle_http_client);
+        ESP_LOGI(TAG, "HTTP GET Status = %d, content_length = %"PRIu64,statusCode,contentLenth);
+        
     }else{
         ESP_LOGE(TAG,"Http GET request failed");
         contentLenth=0;
