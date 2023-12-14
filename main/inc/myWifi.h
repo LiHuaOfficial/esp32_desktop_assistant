@@ -21,7 +21,7 @@ void Task_WifiScan(void *arg);
 /// @param ssid 本来就是获取的ssid不会超出范围
 /// @param pwd 通过Textarea限制长度
 /// @return 
-esp_err_t MyWifi_Connect(char* ssid,char* pwd);
+esp_err_t MyWifi_Connect(bool defaultConnect,char* ssid,char* pwd);
 #ifdef __cplusplus
 }
 #endif

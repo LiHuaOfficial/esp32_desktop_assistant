@@ -56,7 +56,7 @@ void Keyboard_Wifi_Handler(lv_event_t* e)
         //Enter按下
         //开始联网
         //可能还要准备一个专用于通知的任务
-        MyWifi_Connect(lv_label_get_text(ssidLabel),lv_textarea_get_text(textArea));
+        MyWifi_Connect(false,lv_label_get_text(ssidLabel),lv_textarea_get_text(textArea));
 
         lv_obj_fade_out(wifi_widget,500,100);
         lv_obj_del(wifi_widget); 

@@ -8,6 +8,8 @@ extern "C"{
 #include "lvgl.h"
 
 extern lv_obj_t* obj_weather;
+extern lv_obj_t* obj_time;
+
 void Task_MainScene(void * arg);
 
 #ifdef __cplusplus

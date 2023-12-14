@@ -19,6 +19,7 @@ extern "C"{
 和一些标志位的宏定义
 可能还会包括一些杂项
 */
+#define ROUTINE_UPDATE_NETWORK_TIME_S (60)
 
 #define ROUTINE_BIT_WIFI_SCAN_START BIT0
 #define ROUTINE_BIT_WIFI_CONNECT_SUCCESS BIT1//更新主界面状态栏
@@ -26,11 +27,11 @@ extern "C"{
 
 typedef struct
 {   
-    //esp system
+    //连接wifi时才为true
     bool wifi;
     //lvgl labels in status bar
     lv_obj_t* label_wifiStatus;
-    //lvgl menu
+    //wifi开关，连接成功后会强制置true，但为true不一定连接wifi
     bool menu_wifi_switch;
 
     

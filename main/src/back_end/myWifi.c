@@ -81,35 +81,6 @@ void Task_WifiInit(void* arg){
 
     ESP_ERROR_CHECK(esp_wifi_start());//WIFI_EVENT_STA_START 将随后产生
     
-
-    //手动设置e.g.
-    // wifi_config_t cfg_wifi={
-    //     .sta={
-    //         .ssid=TEMP_SSID,
-    //         .password=TEMP_PASS,
-    //         .threshold.authmode=WIFI_AUTH_WPA_WPA2_PSK,
-    //         //.sae_h2e_identifier 与WAP3加密有关
-    //     }
-    // };
-
-
-    //接收gui窗口发来的信号
-    //eventGroup_wifi=xEventGroupCreate();
-
-    // while(1){
-    //     //阻塞，等待
-    //     EventBits_t bits=xEventGroupWaitBits(eventGroup_lvgl2espWifi,LVGL2WIFI_CONNECT_BIT | LVGL2WIFI_SCAN_BIT,
-    //                                         pdTRUE,pdFALSE,portMAX_DELAY);
-        
-    //     if(bits & LVGL2WIFI_SCAN_BIT){
-    //         //gui发出扫描信号
-
-    //     }else if(bits & LVGL2WIFI_CONNECT_BIT){
-    //         //gui发出连接信号，连接特定ssid
-            
-    //     }
-    // }
-    
     vTaskDelete(NULL);//任务结束时删除是个好习惯
 }
 
@@ -121,7 +92,7 @@ static void Handler_WifiEvent(void* arg, esp_event_base_t event_base,
     if(event_base == WIFI_EVENT){//直接比较地址
         if(event_id==WIFI_EVENT_STA_START) esp_wifi_connect();
         else if(event_id==WIFI_EVENT_STA_DISCONNECTED){
-            if(common_status.menu_wifi_switch==true){
+            if(common_status.menu_wifi_switch==true){//wifi非人为断开
                 common_status.wifi=false;
                 //只有开关未关时才重连
                 if(retryNum<WIFI_MAX_RETRIES){
@@ -147,7 +118,6 @@ static void Handler_WifiEvent(void* arg, esp_event_base_t event_base,
         if(event_id==IP_EVENT_STA_GOT_IP){
             ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
             ESP_LOGI(TAG, "Connect success");
-            ESP_LOGI(TAG, "Hello?");
             ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
             retryNum=0;
             
@@ -209,26 +179,28 @@ void Task_WifiScan(void* args){
     vTaskDelete(NULL);
 }
 
-esp_err_t MyWifi_Connect(char* ssid,char* pwd){
+esp_err_t MyWifi_Connect(bool defaultConnect,char* ssid,char* pwd){
     //在inputscene里被键盘回调调用
-    esp_wifi_stop();
-    wifi_config_t cfg_wifi={
-        .sta={
-            .ssid="",
-            .password="",
-            .threshold.authmode=WIFI_AUTH_WPA_WPA2_PSK,
-            //.sae_h2e_identifier 与WAP3加密有关
-        }
-    };
-    strcpy((char*)cfg_wifi.sta.ssid,(char*)ssid);
-    strcpy((char*)cfg_wifi.sta.password,(char*)pwd);
-    
-    ESP_LOGI(TAG,"ssid:%s",cfg_wifi.sta.ssid);
-    ESP_LOGI(TAG,"password:%s",cfg_wifi.sta.password);
     esp_err_t e_type;
-    if((e_type=esp_wifi_set_config(WIFI_IF_STA,&cfg_wifi))==ESP_OK){
+    if(!defaultConnect){
+        esp_wifi_stop();
+        wifi_config_t cfg_wifi={
+            .sta={
+                .ssid="",
+                .password="",
+                .threshold.authmode=WIFI_AUTH_WPA_WPA2_PSK,
+                //.sae_h2e_identifier 与WAP3加密有关
+            }
+        };
+        strcpy((char*)cfg_wifi.sta.ssid,(char*)ssid);
+        strcpy((char*)cfg_wifi.sta.password,(char*)pwd);
+        ESP_LOGI(TAG,"ssid:%s",cfg_wifi.sta.ssid);
+        ESP_LOGI(TAG,"password:%s",cfg_wifi.sta.password);
 
-    }else return e_type;
+        
+        if((e_type=esp_wifi_set_config(WIFI_IF_STA,&cfg_wifi))==ESP_OK){}
+        else return e_type;
+    }   
 
     if((e_type=esp_wifi_start())==ESP_OK){
         //start后将由esp_event_loop处理连接

@@ -8,6 +8,8 @@
 #include "esp_log.h"
 
 #include "http.h"
+#include "sntp.h"
+#include "mainscene.h"
 
 #define TAG "NOTE"
 
@@ -32,7 +34,29 @@ void Task_Routine(void *arg)
 
     //需要定时处理的操作
     xTaskCreate(Task_Http,"Http",4096*3,NULL,5,NULL);
+    SNTP_init();
 
+    uint32_t count=0;
+    while (1)
+    {
+        count++;
+        //每秒更新一次时间
+        struct tm currentTime=SNTP_GetTime();//如此传参效率较低
+        xSemaphoreTake(xGuiSemaphore,portMAX_DELAY);
+        lv_label_set_text_fmt(lv_obj_get_child(obj_time,0),"%d:%d:%d",currentTime.tm_hour,currentTime.tm_min,currentTime.tm_sec);//时间
+        lv_label_set_text_fmt(lv_obj_get_child(obj_time,1),"%d/%d/%d",currentTime.tm_year,currentTime.tm_mon,currentTime.tm_mday);//日期
+        xSemaphoreGive(xGuiSemaphore);        
+        //如果没有手动关闭wifi，应当重连
+        /*真的必要吗？？？*/
+        
+        //每分钟进行一次网络对时
+        if(count==ROUTINE_UPDATE_NETWORK_TIME_S){
+            if(common_status.wifi) SNTP_Update();
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));
+
+    }
+    
     vTaskDelete(NULL);
 }
 
