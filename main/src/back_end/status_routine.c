@@ -37,14 +37,16 @@ void Task_Routine(void *arg)
     SNTP_init();
 
     uint32_t count=0;
+    vTaskDelay(pdMS_TO_TICKS(800));
+    if(common_status.wifi) SNTP_Update();//先更新一次
     while (1)
     {
         count++;
         //每秒更新一次时间
         struct tm currentTime=SNTP_GetTime();//如此传参效率较低
         xSemaphoreTake(xGuiSemaphore,portMAX_DELAY);
-        lv_label_set_text_fmt(lv_obj_get_child(obj_time,0),"%d:%d:%d",currentTime.tm_hour,currentTime.tm_min,currentTime.tm_sec);//时间
-        lv_label_set_text_fmt(lv_obj_get_child(obj_time,1),"%d/%d/%d",currentTime.tm_year,currentTime.tm_mon,currentTime.tm_mday);//日期
+        lv_label_set_text_fmt(lv_obj_get_child(obj_time,0),"%02d:%02d:%02d",(currentTime.tm_hour+8)%24,currentTime.tm_min,currentTime.tm_sec);//时间
+        lv_label_set_text_fmt(lv_obj_get_child(obj_time,1),"%d/%02d/%02d",currentTime.tm_year+1900,currentTime.tm_mon+1,currentTime.tm_mday);//日期
         xSemaphoreGive(xGuiSemaphore);        
         //如果没有手动关闭wifi，应当重连
         /*真的必要吗？？？*/

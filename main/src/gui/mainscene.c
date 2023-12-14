@@ -53,11 +53,24 @@ void Task_MainScene(void * arg){
     lv_label_set_text(common_status.label_wifiStatus,"No Wifi");
     lv_obj_align_to(common_status.label_wifiStatus,label_wifiLogo,LV_ALIGN_LEFT_MID,17,0);
 
+    //时间框
+    obj_time=lv_obj_create(mainScene);
+    lv_obj_clear_flag(obj_time,LV_OBJ_FLAG_SCROLLABLE);
+    //lv_obj_set_pos(obj_time,0,20);
+    lv_obj_align(obj_time,LV_ALIGN_TOP_MID,0,20);
+    lv_obj_set_size(obj_time,230,90);
+    lv_obj_t* label_time=lv_label_create(obj_time);
+    lv_obj_align(label_time,LV_ALIGN_TOP_MID,0,0);
+    lv_obj_set_style_text_font(label_time,&lv_font_montserrat_48,0);
+
+    lv_obj_t* label_date=lv_label_create(obj_time);
+    lv_obj_align_to(label_date,label_time,LV_ALIGN_OUT_BOTTOM_MID,-20,0);
     //天气框
     obj_weather=lv_obj_create(mainScene);
     lv_obj_clear_flag(obj_weather,LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_pos(obj_weather,0,20);
-    //lv_obj_set_size(obj_weather,lv_obj_get_width(obj_weather)+10,lv_obj_get_height(obj_weather)-20);
+    
+    lv_obj_set_size(obj_weather,200,80);
+    lv_obj_align_to(obj_weather,obj_time,LV_ALIGN_OUT_BOTTOM_MID,0,0);
 
     lv_obj_t* label_place=lv_label_create(obj_weather);
     lv_obj_t* label_weather=lv_label_create(obj_weather);
@@ -72,15 +85,8 @@ void Task_MainScene(void * arg){
     lv_label_set_text(label_place,      "City:   None");
     lv_label_set_text(label_weather,    "Weather:None");
     lv_label_set_text(label_temperature,"Temp:   None");
-    //时间框
-    obj_time=lv_obj_create(mainScene);
-    lv_obj_align_to(obj_time,obj_weather,LV_ALIGN_OUT_BOTTOM_MID,0,0);
-    lv_obj_clear_flag(obj_weather,LV_OBJ_FLAG_SCROLLABLE);
 
-    lv_obj_t* label_time=lv_label_create(obj_time);
-    lv_obj_t* label_date=lv_label_create(obj_time);
-    lv_obj_align_to(label_date,label_time,LV_ALIGN_OUT_BOTTOM_MID,0,0);
-
+    lv_obj_move_foreground(btn_setup);
     xSemaphoreGive(xGuiSemaphore);
 
     vTaskDelete(NULL);
