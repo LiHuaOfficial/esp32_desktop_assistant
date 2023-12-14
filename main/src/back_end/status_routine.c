@@ -20,7 +20,7 @@ EventGroupHandle_t eventGroup_note;
 
 Common_status common_status={
     .wifi=false,
-    .label_wifiStatus=NULL,
+    .obj_statusBar=NULL,
     .menu_wifi_switch=false
 };
 

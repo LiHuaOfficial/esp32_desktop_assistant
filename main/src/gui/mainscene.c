@@ -35,23 +35,23 @@ void Task_MainScene(void * arg){
     lv_obj_add_event_cb(btn_setup,MenuEnter_Handler,LV_EVENT_CLICKED,NULL);
 
     //Wifi状态栏
-    lv_obj_t* obj_statusBar=lv_obj_create(mainScene);
-    lv_obj_set_align(obj_statusBar,LV_ALIGN_TOP_LEFT);
+    common_status.obj_statusBar=lv_obj_create(mainScene);
+    lv_obj_set_align(common_status.obj_statusBar,LV_ALIGN_TOP_LEFT);
 
-    lv_obj_set_style_border_width(obj_statusBar,0,LV_PART_MAIN);
-    lv_obj_set_style_outline_width(obj_statusBar,0,0);
-    lv_obj_set_style_radius(obj_statusBar, 0, 0);
-    lv_obj_set_size(obj_statusBar,lv_disp_get_hor_res(NULL),lv_disp_get_ver_res(NULL)/8);
-    lv_obj_clear_flag(obj_statusBar, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_pos(obj_statusBar,-10,-10);
+    lv_obj_set_style_border_width(common_status.obj_statusBar,0,LV_PART_MAIN);
+    lv_obj_set_style_outline_width(common_status.obj_statusBar,0,0);
+    lv_obj_set_style_radius(common_status.obj_statusBar, 0, 0);
+    lv_obj_set_size(common_status.obj_statusBar,lv_disp_get_hor_res(NULL),lv_disp_get_ver_res(NULL)/8);
+    lv_obj_clear_flag(common_status.obj_statusBar, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_pos(common_status.obj_statusBar,-10,-10);
 
-    lv_obj_t* label_wifiLogo=lv_label_create(obj_statusBar);
+    lv_obj_t* label_wifiLogo=lv_label_create(common_status.obj_statusBar);
     lv_label_set_text(label_wifiLogo,LV_SYMBOL_WIFI);
     lv_obj_set_align(label_wifiLogo,LV_ALIGN_TOP_LEFT);
 
-    common_status.label_wifiStatus=lv_label_create(obj_statusBar);
-    lv_label_set_text(common_status.label_wifiStatus,"No Wifi");
-    lv_obj_align_to(common_status.label_wifiStatus,label_wifiLogo,LV_ALIGN_LEFT_MID,17,0);
+    lv_obj_t* label_wifiStatus=lv_label_create(common_status.obj_statusBar);
+    lv_label_set_text(label_wifiStatus,"No Wifi");
+    lv_obj_align_to(label_wifiStatus,label_wifiLogo,LV_ALIGN_LEFT_MID,17,0);
 
     //时间框
     obj_time=lv_obj_create(mainScene);

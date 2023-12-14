@@ -102,7 +102,7 @@ static void Handler_WifiEvent(void* arg, esp_event_base_t event_base,
                 }else{
                     ESP_LOGE(TAG, "Fail after n tries");
                     xSemaphoreTake(xGuiSemaphore,portMAX_DELAY);
-                    lv_label_set_text(common_status.label_wifiStatus,"No Wifi");
+                    lv_label_set_text(lv_obj_get_child(common_status.obj_statusBar,1),"No Wifi");
                     xSemaphoreGive(xGuiSemaphore);
                     xEventGroupSetBits(eventGroup_note,ROUTINE_BIT_WIFI_CONNECT_FAILED);
                 }
@@ -111,7 +111,7 @@ static void Handler_WifiEvent(void* arg, esp_event_base_t event_base,
         }else if(event_id==WIFI_EVENT_STA_CONNECTED){
             wifi_event_sta_connected_t* event=(wifi_event_sta_connected_t*)event_data;
             xSemaphoreTake(xGuiSemaphore,portMAX_DELAY);
-            lv_label_set_text_fmt(common_status.label_wifiStatus,"%s",event->ssid);
+            lv_label_set_text_fmt(lv_obj_get_child(common_status.obj_statusBar,1),"%s",event->ssid);
             xSemaphoreGive(xGuiSemaphore);           
         }
     }else if(event_base == IP_EVENT){

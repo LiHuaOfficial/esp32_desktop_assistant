@@ -29,8 +29,8 @@ typedef struct
 {   
     //连接wifi时才为true
     bool wifi;
-    //lvgl labels in status bar
-    lv_obj_t* label_wifiStatus;
+    //状态栏
+    lv_obj_t* obj_statusBar;
     //wifi开关，连接成功后会强制置true，但为true不一定连接wifi
     bool menu_wifi_switch;
 
