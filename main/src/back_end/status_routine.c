@@ -56,7 +56,6 @@ void Task_Routine(void *arg)
             if(common_status.wifi) SNTP_Update();
         }
         vTaskDelay(pdMS_TO_TICKS(1000));
-
     }
     
     vTaskDelete(NULL);
@@ -104,9 +103,10 @@ static void Generate_NoteWidget(char* noteText){
     lv_obj_set_size(label_note,lv_obj_get_width(widget_note),lv_obj_get_height(widget_note));
     lv_label_set_long_mode(label_note,LV_LABEL_LONG_SCROLL_CIRCULAR);
     lv_obj_move_foreground(widget_note);
-    // lv_timer_t* timer_delNote=lv_timer_create(DelTimer_Cb,2000,widget_note);
-    // lv_timer_set_repeat_count(timer_delNote,1);
-    //lv_timer_ready(timer_delNote);
+
+    lv_timer_t* timer_delNote=lv_timer_create(DelTimer_Cb,3000,widget_note);
+    lv_timer_set_repeat_count(timer_delNote,1);
+
     lv_obj_fade_out(widget_note,500,2000);
     xSemaphoreGive(xGuiSemaphore);
 
