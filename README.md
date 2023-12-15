@@ -51,6 +51,10 @@ gpio_set_direction(XXXX_DC, GPIO_MODE_OUTPUT);
 ```
 同样在esp_lcd_backlight.c中修改GPIO的初始化，如果不使用pwm控制的话将背光IO直接置高电平即可
 
++ ### 修改IDF.PY menuconfig
+将其中的LVGL configuration中color项内的Images pixels with this color will not be drawn项改为0x0000，使得图片不显示黑边
+（生成时颜色格式为CF_TRUE_COLOR_CHROMA，LVGL将不会渲染为0x0000的像素） 
+
 ## 可能出现的问题
 + ### 找不到头文件
 将.vscode\c_cpp_properties.json中的"compilerPath"更改为ESP-IDF build project时显示的编译器路径即可

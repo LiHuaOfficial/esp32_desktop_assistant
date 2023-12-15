@@ -109,7 +109,6 @@ static void Generate_NoteWidget(char* noteText){
 
     lv_obj_fade_out(widget_note,500,2000);
     xSemaphoreGive(xGuiSemaphore);
-
 } 
 
 void DelTimer_Cb(lv_timer_t *timer)

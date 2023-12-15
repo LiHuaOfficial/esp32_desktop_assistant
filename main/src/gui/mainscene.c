@@ -86,6 +86,11 @@ void Task_MainScene(void * arg){
     lv_label_set_text(label_weather,    "Weather:None");
     lv_label_set_text(label_temperature,"Temp:   None");
 
+    //尝试展示图片
+    lv_obj_t* icon=lv_img_create(mainScene);
+    lv_img_set_src(icon,"S:/spiffs/sunny.bin");
+    lv_obj_set_pos(icon,0,0);
+
     lv_obj_move_foreground(btn_setup);
     xSemaphoreGive(xGuiSemaphore);
 

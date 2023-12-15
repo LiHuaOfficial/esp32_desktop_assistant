@@ -10,7 +10,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
- 
+#include <sys/unistd.h>
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
@@ -20,8 +21,8 @@
 #include "esp_system.h"
 #include "driver/gpio.h"
 #include "esp_timer.h"
-//wifi
-
+#include "esp_spiffs.h"
+#include "esp_log.h"
 
 #include "lwip/err.h"
 #include "lwip/sys.h"
@@ -63,6 +64,7 @@ extern lv_indev_t* indev_touchpad;
 lv_obj_t* mainScene;
 lv_obj_t* setupScene;
 
+lv_fs_drv_t drv;
 // lv_group_t* group_mainScene;
 // lv_group_t* group_setupScene_default;
 
@@ -78,13 +80,38 @@ static void guiTask(void *pvParameter);
 
 static void Task_LED(void *arg);
 
-
+void* my_open_cb(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
+lv_fs_res_t my_read_cb(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br);
+lv_fs_res_t my_close_cb(lv_fs_drv_t * drv, void * file_p);
+lv_fs_res_t my_seek_cb(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence);
+lv_fs_res_t my_tell_cb(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
 
 /**********************
  *   APPLICATION MAIN
  **********************/
 void app_main()
-{
+{   
+    //spiffs init
+    ESP_LOGI(TAG, "Initializing SPIFFS");
+    esp_vfs_spiffs_conf_t conf = {
+      .base_path = "/spiffs",
+      .partition_label = NULL,
+      .max_files = 7,
+      .format_if_mount_failed = false
+    };
+    // Use settings defined above to initialize and mount SPIFFS filesystem. mount v.挂载
+    esp_err_t ret = esp_vfs_spiffs_register(&conf);
+    if (ret != ESP_OK) {
+        if (ret == ESP_FAIL) ESP_LOGE(TAG, "Failed to mount or format filesystem");
+        else if (ret == ESP_ERR_NOT_FOUND) ESP_LOGE(TAG, "Failed to find SPIFFS partition");
+        else ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
+        return;
+    }
+    size_t total = 0, used = 0;
+    ret = esp_spiffs_info(NULL, &total, &used);
+    if (ret != ESP_OK) ESP_LOGE(TAG, "Failed to get SPIFFS partition information (%s)", esp_err_to_name(ret));
+    else ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
+
     //LED init
     gpio_set_direction(GPIO_NUM_32,GPIO_MODE_OUTPUT);
     gpio_set_level(GPIO_NUM_32,1);
@@ -99,72 +126,29 @@ void app_main()
     //xTaskCreate(Task_ADC,"ADC",4096,NULL,0,NULL);
     
 }
- 
-/* Creates a semaphore to handle concurrent call to lvgl stuff
- * If you wish to call *any* lvgl function from other threads/tasks
- * you should lock on the very same semaphore! */
-
 
 static void guiTask(void *pvParameter)
 {
- 
     (void)pvParameter;
     xGuiSemaphore = xSemaphoreCreateMutex();
- 
     lv_init();
- 
-    /* Initialize SPI or I2C bus used by the drivers */
-    lvgl_driver_init();
-    
+    lvgl_driver_init();//from lvgl_esp32_driver
     lv_color_t *buf1 = heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
     assert(buf1 != NULL);
- 
     /* Use double buffered when not working with monochrome displays */
-#ifndef CONFIG_LV_TFT_DISPLAY_MONOCHROME
     lv_color_t *buf2 = heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
     assert(buf2 != NULL);
-#else
-    static lv_color_t *buf2 = NULL;
-#endif
- 
     static lv_disp_draw_buf_t disp_buf;
- 
     uint32_t size_in_px = DISP_BUF_SIZE;
- 
-#if defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_IL3820 || defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_JD79653A || defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_UC8151D || defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_SSD1306
-    size_in_px *= 8;
-#endif
- 
-    /* Initialize the working buffer depending on the selected display.
-     * NOTE: buf2 == NULL when using monochrome displays. */
     lv_disp_draw_buf_init(&disp_buf, buf1, buf2, size_in_px);
- 
+
     lv_disp_drv_t disp_drv;
     lv_disp_drv_init(&disp_drv);
     disp_drv.flush_cb = disp_driver_flush;
- 
-    /* When using a monochrome display we need to register the callbacks:
-     * - rounder_cb
-     * - set_px_cb */
-#ifdef CONFIG_LV_TFT_DISPLAY_MONOCHROME
-    disp_drv.rounder_cb = disp_driver_rounder;
-    disp_drv.set_px_cb = disp_driver_set_px;
-#endif
- 
     disp_drv.draw_buf = &disp_buf;
     disp_drv.hor_res = LV_HOR_RES_MAX;
     disp_drv.ver_res = LV_VER_RES_MAX;
     lv_disp_drv_register(&disp_drv);
- 
-    /* Register an input device when enabled on the menuconfig */
-#if CONFIG_LV_TOUCH_CONTROLLER != TOUCH_CONTROLLER_NONE
-    lv_indev_drv_t indev_drv;
-    lv_indev_drv_init(&indev_drv);
-    indev_drv.read_cb = touch_driver_read;
-    indev_drv.type = LV_INDEV_TYPE_POINTER;
-    lv_indev_drv_register(&indev_drv);
-#endif
- 
     /* Create and start a periodic timer interrupt to call lv_tick_inc */
     const esp_timer_create_args_t periodic_timer_args = {
         .callback = &lv_tick_task,
@@ -179,12 +163,16 @@ static void guiTask(void *pvParameter)
     lv_obj_t* cursor=lv_img_create(lv_scr_act());
     lv_img_set_src(cursor,LV_SYMBOL_CLOSE);
     lv_indev_set_cursor(indev_touchpad,cursor);
-    //设置默认输入组
-    // lv_group_t *g=lv_group_create();
-    // lv_group_set_default(g);
-    // lv_indev_set_group(indev_keypad,g);
-    /* Create the demo application */
-    //create_demo_application();
+
+    //初始化Lvgl文件系统                   
+    lv_fs_drv_init(&drv);                     /*Basic initialization*/
+    drv.letter = 'S';                         /*An uppercase letter to identify the drive */
+    drv.open_cb = my_open_cb;                 /*Callback to open a file */
+    drv.close_cb = my_close_cb;               /*Callback to close a file */
+    drv.read_cb = my_read_cb;                 /*Callback to read a file */
+    drv.seek_cb = my_seek_cb;                 /*Callback to seek in a file (Move cursor) */
+    drv.tell_cb = my_tell_cb;  
+    lv_fs_drv_register(&drv);                 /*Finally register the drive*/
 
     //实例化屏幕
     mainScene=lv_scr_act();
@@ -202,19 +190,10 @@ static void guiTask(void *pvParameter)
         vTaskDelay(pdMS_TO_TICKS(10));
  
         /* Try to take the semaphore, call lvgl related function on success */
-        if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
-        {
-            lv_task_handler();
-            xSemaphoreGive(xGuiSemaphore);
-        }
+        xSemaphoreTake(xGuiSemaphore, portMAX_DELAY);    
+        lv_task_handler();
+        xSemaphoreGive(xGuiSemaphore);
     }
- 
-    /* A task should NEVER return */
-    free(buf1);
-#ifndef CONFIG_LV_TFT_DISPLAY_MONOCHROME
-    free(buf2);
-#endif
-    vTaskDelete(NULL);
 }
  
 static void lv_tick_task(void *arg)
@@ -235,6 +214,44 @@ static void Task_LED(void *arg){
     } 
 }
 
+lv_fs_res_t my_read_cb(lv_fs_drv_t *drv, void *file_p, void *buf, uint32_t btr, uint32_t *br)
+{
+    *br=fread(buf,1,btr,file_p);//byte by byte
+    return LV_FS_RES_OK;
+}
 
+void* my_open_cb(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
+{
+    if(mode==LV_FS_MODE_RD){
+        FILE* f=fopen(path,"r");
+        return f;
+    }else return NULL;
+}
 
+lv_fs_res_t my_close_cb(lv_fs_drv_t * drv, void * file_p){
+    if(!fclose(file_p)) return LV_FS_RES_OK;
+    else return LV_FS_RES_DENIED;
+}
 
+lv_fs_res_t my_seek_cb(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence){
+    int ret=1;
+    switch (whence)
+    {
+    case LV_FS_SEEK_SET:
+        ret=fseek(file_p,pos,SEEK_SET);
+        break;
+    case LV_FS_SEEK_CUR:
+        ret=fseek(file_p,pos,SEEK_CUR);
+        break;
+    case LV_FS_SEEK_END:
+        ret=fseek(file_p,pos,SEEK_END);
+        break;
+    }
+    if(!ret) return LV_FS_RES_OK;
+    else return LV_FS_RES_DENIED;
+}
+lv_fs_res_t my_tell_cb(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p){
+    *pos_p=ftell(file_p);
+    if((*pos_p)==(uint32_t)(-1)) return LV_FS_RES_DENIED;
+    else return LV_FS_RES_OK;
+}
