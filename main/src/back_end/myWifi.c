@@ -81,6 +81,7 @@ void Task_WifiInit(void* arg){
 
     ESP_ERROR_CHECK(esp_wifi_start());//WIFI_EVENT_STA_START 将随后产生
     
+    //printf("inWifiInit:%lu\n",uxTaskGetStackHighWaterMark2(xTaskGetCurrentTaskHandle()));
     vTaskDelete(NULL);//任务结束时删除是个好习惯
 }
 
@@ -176,10 +177,11 @@ void Task_WifiScan(void* args){
     //lv_obj_update_layout(subMenu);
     xSemaphoreGive(xGuiSemaphore);
 
+    //printf("inWifiScan:%lu\n",uxTaskGetStackHighWaterMark2(xTaskGetCurrentTaskHandle()));
     vTaskDelete(NULL);
 }
 
-esp_err_t MyWifi_Connect(bool defaultConnect,char* ssid,char* pwd){
+esp_err_t MyWifi_Connect(bool defaultConnect,const char* ssid,const char* pwd){
     //在inputscene里被键盘回调调用
     esp_err_t e_type;
     if(!defaultConnect){

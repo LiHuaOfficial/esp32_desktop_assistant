@@ -31,6 +31,7 @@ void Task_Http(void* arg)
         vTaskDelay(HTTP_REQUST_INTERVAL_MS/portTICK_PERIOD_MS);
         if(common_status.wifi==true){
             Http_get_from_url();
+            //printf("inHttp:%lu\n",uxTaskGetStackHighWaterMark2(xTaskGetCurrentTaskHandle()));
         }
     }
 }

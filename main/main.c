@@ -121,10 +121,6 @@ void app_main()
      * Otherwise there can be problem such as memory corruption and so on.
      * NOTE: When not using Wi-Fi nor Bluetooth you can pin the guiTask to core 0 */
     xTaskCreatePinnedToCore(guiTask, "gui", 4096 * 2, NULL,GUI_PRIORITY, NULL, 1);
-
-    
-    //xTaskCreate(Task_ADC,"ADC",4096,NULL,0,NULL);
-    
 }
 
 static void guiTask(void *pvParameter)
@@ -179,11 +175,11 @@ static void guiTask(void *pvParameter)
     setupScene=lv_obj_create(NULL);
 
     xTaskCreatePinnedToCore(Task_MainScene,"MainScene",4096*2,NULL,GUI_PRIORITY,&TaskHandle_MainScene,1);
-    xTaskCreatePinnedToCore(Task_SetupScene,"SetupScene",4096*3,NULL,GUI_PRIORITY,&TaskHandle_SetupScene,1);
+    xTaskCreatePinnedToCore(Task_SetupScene,"SetupScene",4096*2,NULL,GUI_PRIORITY,&TaskHandle_SetupScene,1);
 
     xTaskCreate(Task_Routine,"Routine",4096,NULL,configMAX_PRIORITIES,NULL);
 
-    xTaskCreate(Task_WifiInit,"Wifi",4096*5,NULL,WIFI_PRIORTY,&TaskHandle_Wifi);
+    xTaskCreate(Task_WifiInit,"Wifi",4096*2,NULL,WIFI_PRIORTY,&TaskHandle_Wifi);
     while (1)
     {
         /* Delay 1 tick (assumes FreeRTOS tick is 10ms */

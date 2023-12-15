@@ -69,10 +69,10 @@ void Task_MainScene(void * arg){
     lv_obj_clear_flag(obj_time,LV_OBJ_FLAG_SCROLLABLE);
     //lv_obj_set_pos(obj_time,0,20);
     lv_obj_align(obj_time,LV_ALIGN_TOP_MID,0,20);
-    lv_obj_set_size(obj_time,230,90);
+    lv_obj_set_size(obj_time,240,90);
     lv_obj_t* label_time=lv_label_create(obj_time);
     lv_obj_align(label_time,LV_ALIGN_TOP_MID,0,0);
-    lv_obj_set_style_text_font(label_time,&lv_font_montserrat_48,0);
+    lv_obj_set_style_text_font(label_time,&lv_font_montserrat_48,LV_PART_MAIN);
 
     lv_obj_t* label_date=lv_label_create(obj_time);
     lv_obj_align_to(label_date,label_time,LV_ALIGN_OUT_BOTTOM_MID,-30,0);
@@ -80,16 +80,19 @@ void Task_MainScene(void * arg){
     obj_weather=lv_obj_create(mainScene);
     lv_obj_clear_flag(obj_weather,LV_OBJ_FLAG_SCROLLABLE);
     
-    lv_obj_set_size(obj_weather,200,80);
-    lv_obj_align_to(obj_weather,obj_time,LV_ALIGN_OUT_BOTTOM_MID,0,0);
+    lv_obj_set_size(obj_weather,120,65);//
+    lv_obj_align_to(obj_weather,obj_time,LV_ALIGN_OUT_BOTTOM_LEFT,0,0);
 
     lv_obj_t* label_temperature=lv_label_create(obj_weather);
-    lv_obj_align(label_temperature,LV_ALIGN_TOP_LEFT,0,0);
+    lv_obj_align(label_temperature,LV_ALIGN_TOP_LEFT,-10,-10);
+    lv_obj_set_style_text_font(label_temperature,&lv_font_montserrat_26,LV_PART_MAIN);
     lv_obj_t* label_weather=lv_label_create(obj_weather);
-    lv_obj_align_to(label_weather,label_temperature,LV_ALIGN_OUT_BOTTOM_MID,0,0);
+    lv_obj_align_to(label_weather,label_temperature,LV_ALIGN_OUT_BOTTOM_LEFT,0,0);
+    lv_label_set_long_mode(label_weather,LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_obj_set_width(label_weather,50);
 
     lv_obj_t* img_weatherLogo=lv_img_create(obj_weather);
-    lv_obj_align(img_weatherLogo,LV_ALIGN_TOP_RIGHT,0,0);
+    lv_obj_align(img_weatherLogo,LV_ALIGN_TOP_RIGHT,5,0);
 
     lv_label_set_long_mode(label_weather,LV_LABEL_LONG_SCROLL_CIRCULAR);
     lv_label_set_long_mode(label_temperature,LV_LABEL_LONG_SCROLL_CIRCULAR);
@@ -100,6 +103,7 @@ void Task_MainScene(void * arg){
     lv_obj_move_foreground(btn_setup);
     xSemaphoreGive(xGuiSemaphore);
 
+    //printf("inMainScene:%lu\n",uxTaskGetStackHighWaterMark2(xTaskGetCurrentTaskHandle()));
     vTaskDelete(NULL);
 }
 

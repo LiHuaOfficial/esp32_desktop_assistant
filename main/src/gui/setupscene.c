@@ -125,6 +125,8 @@ void Task_SetupScene(void* arg){
     
     currentSubMenu=SubMenu_Menu1_Create();//创建默认菜单
     xSemaphoreGive(xGuiSemaphore);
+
+    printf("inSetupScene:%lu\n",uxTaskGetStackHighWaterMark2(xTaskGetCurrentTaskHandle()));
     vTaskDelete(xTaskGetCurrentTaskHandle());
 }
 
@@ -342,7 +344,7 @@ static void WifiMenu_Refresh_Switch_Handler(lv_event_t* e){
             //直接开始扫描
             esp_wifi_start();//?
             common_status.menu_wifi_switch=true;
-            xTaskCreate(Task_WifiScan,"WifiScan",4096*2,subMenu,2,NULL);
+            xTaskCreate(Task_WifiScan,"WifiScan",4096,subMenu,2,NULL);
         }else{
             common_status.menu_wifi_switch=false;
             esp_wifi_stop();
@@ -350,7 +352,7 @@ static void WifiMenu_Refresh_Switch_Handler(lv_event_t* e){
     }else if(code==LV_EVENT_CLICKED && lv_obj_check_type(Switch,&lv_btn_class)){
         //处理刷新按钮
         if(common_status.menu_wifi_switch==true){
-            xTaskCreate(Task_WifiScan,"WifiScan",4096*2,subMenu,2,NULL);
+            xTaskCreate(Task_WifiScan,"WifiScan",4096,subMenu,2,NULL);
         }
     }
 }

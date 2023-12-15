@@ -35,7 +35,7 @@ void Task_Routine(void *arg)
     xTaskCreate(Task_MyEventHandle,"MyEvent",4096,NULL,configMAX_PRIORITIES,NULL);
 
     //需要定时处理的操作
-    xTaskCreate(Task_Http,"Http",4096*3,NULL,5,NULL);
+    xTaskCreate(Task_Http,"Http",4096*2,NULL,5,NULL);
     SNTP_init();
 
     uint32_t count=0;
@@ -51,7 +51,7 @@ void Task_Routine(void *arg)
         lv_label_set_text_fmt(lv_obj_get_child(obj_time,0),"%02d:%02d:%02d",
                               (currentTime.tm_hour+8)%24,currentTime.tm_min,currentTime.tm_sec);//时间
         lv_label_set_text_fmt(lv_obj_get_child(obj_time,1),"%d/%02d/%02d %s",
-                              currentTime.tm_year+1900,currentTime.tm_mon+1,currentTime.tm_mday,dates[currentTime.tm_wday+1]);//日期
+                              currentTime.tm_year+1900,currentTime.tm_mon+1,currentTime.tm_mday,dates[currentTime.tm_wday-1]);//日期
         xSemaphoreGive(xGuiSemaphore);        
         //如果没有手动关闭wifi，应当重连
         /*真的必要吗？？？*/
@@ -59,6 +59,7 @@ void Task_Routine(void *arg)
         //每分钟进行一次网络对时
         if(count==ROUTINE_UPDATE_NETWORK_TIME_S){
             if(common_status.wifi) SNTP_Update();
+            //printf("inRoutine:%lu\n",uxTaskGetStackHighWaterMark2(xTaskGetCurrentTaskHandle()));
         }
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
@@ -90,6 +91,8 @@ void Task_MyEventHandle(void* arg){
             ESP_LOGI(TAG,"Wifi Connect Failed");
             Generate_NoteWidget("Wifi Connect Failed");
         }
+
+        //printf("inEvent:%lu\n",uxTaskGetStackHighWaterMark2(xTaskGetCurrentTaskHandle()));
     }
 }
 
