@@ -51,8 +51,19 @@ void Task_MainScene(void * arg){
 
     lv_obj_t* label_wifiStatus=lv_label_create(common_status.obj_statusBar);
     lv_label_set_text(label_wifiStatus,"No Wifi");
-    lv_obj_align_to(label_wifiStatus,label_wifiLogo,LV_ALIGN_LEFT_MID,17,0);
+    lv_label_set_long_mode(label_wifiStatus,LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_obj_set_width(label_wifiStatus,40);
+    lv_obj_align_to(label_wifiStatus,label_wifiLogo,LV_ALIGN_OUT_RIGHT_MID,0,0);
 
+    lv_obj_t* label_placeLogo=lv_label_create(common_status.obj_statusBar);
+    lv_label_set_text(label_placeLogo,LV_SYMBOL_GPS);
+    lv_obj_align_to(label_placeLogo,label_wifiStatus,LV_ALIGN_OUT_RIGHT_MID,20,0);
+
+    lv_obj_t* label_placeStatus=lv_label_create(common_status.obj_statusBar);
+    lv_label_set_text(label_placeStatus,"None");
+    lv_label_set_long_mode(label_placeStatus,LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_obj_set_width(label_placeStatus,40);
+    lv_obj_align_to(label_placeStatus,label_placeLogo,LV_ALIGN_OUT_RIGHT_MID,0,0);
     //时间框
     obj_time=lv_obj_create(mainScene);
     lv_obj_clear_flag(obj_time,LV_OBJ_FLAG_SCROLLABLE);
@@ -72,24 +83,19 @@ void Task_MainScene(void * arg){
     lv_obj_set_size(obj_weather,200,80);
     lv_obj_align_to(obj_weather,obj_time,LV_ALIGN_OUT_BOTTOM_MID,0,0);
 
-    lv_obj_t* label_place=lv_label_create(obj_weather);
     lv_obj_t* label_weather=lv_label_create(obj_weather);
-    lv_obj_align_to(label_weather,label_place,LV_ALIGN_OUT_BOTTOM_MID,0,0);
+    lv_obj_align(label_weather,LV_ALIGN_TOP_LEFT,0,0);
     lv_obj_t* label_temperature=lv_label_create(obj_weather);
     lv_obj_align_to(label_temperature,label_weather,LV_ALIGN_OUT_BOTTOM_MID,0,0);
 
-    lv_label_set_long_mode(label_place,LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_obj_t* img_weatherLogo=lv_img_create(obj_weather);
+    lv_obj_align(img_weatherLogo,LV_ALIGN_TOP_RIGHT,0,0);
+
     lv_label_set_long_mode(label_weather,LV_LABEL_LONG_SCROLL_CIRCULAR);
     lv_label_set_long_mode(label_temperature,LV_LABEL_LONG_SCROLL_CIRCULAR);
 
-    lv_label_set_text(label_place,      "City:   None");
-    lv_label_set_text(label_weather,    "Weather:None");
-    lv_label_set_text(label_temperature,"Temp:   None");
-
-    //尝试展示图片
-    lv_obj_t* icon=lv_img_create(mainScene);
-    lv_img_set_src(icon,"S:/spiffs/sunny.bin");
-    lv_obj_set_pos(icon,0,0);
+    lv_label_set_text(label_weather,    "None");
+    lv_label_set_text(label_temperature,"None");
 
     lv_obj_move_foreground(btn_setup);
     xSemaphoreGive(xGuiSemaphore);
@@ -104,4 +110,49 @@ void MenuEnter_Handler(lv_event_t *e)
     lv_scr_load_anim(setupScene,LV_SCR_LOAD_ANIM_MOVE_RIGHT,200,50,false);
     //lv_indev_set_group(indev_keypad,group_setupScene_default);
     //xSemaphoreGive(xGuiSemaphore);
+}
+
+//https://docs.seniverse.com/api/start/code.html
+//根据网址记录JSON中id到图片的映射
+const uint8_t findImg[]={0,1,0,1,               //晴
+                         2,2,2,2,2,2,           //多云
+                         4,4,4,4,4,4,4,4,4,4,4, //雨
+                         6,6,6,6,6,             //雪
+                         5,5,5,5,               //沙尘
+                         3,3,                   //雾
+                         7,7,7,7,7,              //风
+                         6,0};                   //冷&热
+
+//记录文件名字
+const char imgPath[][16]={
+    "sunny.bin",        //0
+    "sunny_night.bin",  //1
+    "cloudy.bin",       //2
+    "foggy.bin",        //3
+    "rain.bin",         //4
+    "sandy.bin",        //5
+    "snow.bin",         //6
+    "windy.bin"         //7
+};
+
+void MainScene_FindImg(const char* code){
+    uint8_t id=0,i=0;
+    while ('0'<=code[i] && code[i]<='9')
+    {
+        id*=10;
+        id+=(code[i]-'0');
+        i++;
+    }
+
+    //S:/spiffs/ 10字符 
+    char imgSrc[26]="S:/spiffs/"; 
+    if(id>38) return;
+    else {
+        //手动连接字符串
+        for(uint8_t i=10;i-10<strlen(imgPath[findImg[id]]);i++){
+            imgSrc[i]=imgPath[findImg[id]][i-10];
+        }
+        lv_img_set_src(lv_obj_get_child(obj_weather,2),imgSrc);
+    }
+        
 }

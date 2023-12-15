@@ -90,11 +90,12 @@ void Http_get_from_url()
         //从now中取得天气&温度
         cJSON* json_obj_text=cJSON_GetObjectItem(json_obj_now,"text");
         cJSON* json_obj_temperature=cJSON_GetObjectItem(json_obj_now,"temperature");
-
+        cJSON* json_obj_code=cJSON_GetObjectItem(json_obj_now,"code");
         xSemaphoreTake(xGuiSemaphore,portMAX_DELAY);
-        lv_label_set_text_fmt(lv_obj_get_child(obj_weather,0),"City:   %s",json_obj_name->valuestring);
-        lv_label_set_text_fmt(lv_obj_get_child(obj_weather,1),"Weather:%s",json_obj_text->valuestring);
-        lv_label_set_text_fmt(lv_obj_get_child(obj_weather,2),"Temp:   %s°C",json_obj_temperature->valuestring);
+        lv_label_set_text_fmt(lv_obj_get_child(common_status.obj_statusBar,3),"%s",json_obj_name->valuestring);
+        lv_label_set_text_fmt(lv_obj_get_child(obj_weather,0),"%s",json_obj_text->valuestring);
+        lv_label_set_text_fmt(lv_obj_get_child(obj_weather,1),"%s°C",json_obj_temperature->valuestring);
+        MainScene_FindImg(json_obj_code->valuestring);
         xSemaphoreGive(xGuiSemaphore);
 
         cJSON_Delete(resJSON);
