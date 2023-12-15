@@ -75,7 +75,7 @@ void Task_MainScene(void * arg){
     lv_obj_set_style_text_font(label_time,&lv_font_montserrat_48,0);
 
     lv_obj_t* label_date=lv_label_create(obj_time);
-    lv_obj_align_to(label_date,label_time,LV_ALIGN_OUT_BOTTOM_MID,-20,0);
+    lv_obj_align_to(label_date,label_time,LV_ALIGN_OUT_BOTTOM_MID,-30,0);
     //天气框
     obj_weather=lv_obj_create(mainScene);
     lv_obj_clear_flag(obj_weather,LV_OBJ_FLAG_SCROLLABLE);
@@ -83,10 +83,10 @@ void Task_MainScene(void * arg){
     lv_obj_set_size(obj_weather,200,80);
     lv_obj_align_to(obj_weather,obj_time,LV_ALIGN_OUT_BOTTOM_MID,0,0);
 
-    lv_obj_t* label_weather=lv_label_create(obj_weather);
-    lv_obj_align(label_weather,LV_ALIGN_TOP_LEFT,0,0);
     lv_obj_t* label_temperature=lv_label_create(obj_weather);
-    lv_obj_align_to(label_temperature,label_weather,LV_ALIGN_OUT_BOTTOM_MID,0,0);
+    lv_obj_align(label_temperature,LV_ALIGN_TOP_LEFT,0,0);
+    lv_obj_t* label_weather=lv_label_create(obj_weather);
+    lv_obj_align_to(label_weather,label_temperature,LV_ALIGN_OUT_BOTTOM_MID,0,0);
 
     lv_obj_t* img_weatherLogo=lv_img_create(obj_weather);
     lv_obj_align(img_weatherLogo,LV_ALIGN_TOP_RIGHT,0,0);
