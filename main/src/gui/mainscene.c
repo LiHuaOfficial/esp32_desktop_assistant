@@ -84,7 +84,7 @@ void Task_MainScene(void * arg){
     lv_obj_align_to(obj_weather,obj_time,LV_ALIGN_OUT_BOTTOM_LEFT,0,0);
 
     lv_obj_t* label_temperature=lv_label_create(obj_weather);
-    lv_obj_align(label_temperature,LV_ALIGN_TOP_LEFT,-10,-10);
+    lv_obj_align(label_temperature,LV_ALIGN_TOP_LEFT,-10,-5);
     lv_obj_set_style_text_font(label_temperature,&lv_font_montserrat_26,LV_PART_MAIN);
     lv_obj_t* label_weather=lv_label_create(obj_weather);
     lv_obj_align_to(label_weather,label_temperature,LV_ALIGN_OUT_BOTTOM_LEFT,0,0);
@@ -92,7 +92,7 @@ void Task_MainScene(void * arg){
     lv_obj_set_width(label_weather,50);
 
     lv_obj_t* img_weatherLogo=lv_img_create(obj_weather);
-    lv_obj_align(img_weatherLogo,LV_ALIGN_TOP_RIGHT,5,0);
+    lv_obj_align(img_weatherLogo,LV_ALIGN_TOP_RIGHT,9,-2);
 
     lv_label_set_long_mode(label_weather,LV_LABEL_LONG_SCROLL_CIRCULAR);
     lv_label_set_long_mode(label_temperature,LV_LABEL_LONG_SCROLL_CIRCULAR);
