@@ -24,7 +24,7 @@ Common_status common_status={
     .menu_wifi_switch=false
 };
 
-const char dates[][5]={"Mon","Tue","Wed","Thur","Fri","Sat","Sun"};
+const char dates[][5]={"Sun","Mon","Tue","Wed","Thur","Fri","Sat"};
 
 static void Generate_NoteWidget(char* noteText);
 
@@ -51,7 +51,7 @@ void Task_Routine(void *arg)
         lv_label_set_text_fmt(lv_obj_get_child(obj_time,0),"%02d:%02d:%02d",
                               (currentTime.tm_hour+8)%24,currentTime.tm_min,currentTime.tm_sec);//时间
         lv_label_set_text_fmt(lv_obj_get_child(obj_time,1),"%d/%02d/%02d %s",
-                              currentTime.tm_year+1900,currentTime.tm_mon+1,currentTime.tm_mday,dates[currentTime.tm_wday-1]);//日期
+                              currentTime.tm_year+1900,currentTime.tm_mon+1,currentTime.tm_mday,dates[currentTime.tm_wday]);//日期
         xSemaphoreGive(xGuiSemaphore);        
         //如果没有手动关闭wifi，应当重连
         /*真的必要吗？？？*/
