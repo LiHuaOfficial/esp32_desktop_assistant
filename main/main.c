@@ -61,8 +61,10 @@
  **********************/
 extern lv_indev_t* indev_keypad;
 extern lv_indev_t* indev_touchpad;
+
 lv_obj_t* mainScene;
 lv_obj_t* setupScene;
+lv_obj_t* infoScene;
 
 lv_fs_drv_t drv;
 // lv_group_t* group_mainScene;
@@ -173,7 +175,7 @@ static void guiTask(void *pvParameter)
     //实例化屏幕
     mainScene=lv_scr_act();
     setupScene=lv_obj_create(NULL);
-
+    infoScene=lv_obj_create(NULL);
     xTaskCreatePinnedToCore(Task_MainScene,"MainScene",4096*2,NULL,GUI_PRIORITY,&TaskHandle_MainScene,1);
     xTaskCreatePinnedToCore(Task_SetupScene,"SetupScene",4096*2,NULL,GUI_PRIORITY,&TaskHandle_SetupScene,1);
 

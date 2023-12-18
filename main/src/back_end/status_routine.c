@@ -57,10 +57,11 @@ void Task_Routine(void *arg)
         /*真的必要吗？？？*/
         
         //每分钟进行一次网络对时
-        if(count==ROUTINE_UPDATE_NETWORK_TIME_S){
+        if(count%ROUTINE_UPDATE_NETWORK_TIME_S==0){
             if(common_status.wifi) SNTP_Update();
             //printf("inRoutine:%lu\n",uxTaskGetStackHighWaterMark2(xTaskGetCurrentTaskHandle()));
         }
+
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
     
