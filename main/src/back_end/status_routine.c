@@ -10,6 +10,7 @@
 #include "http.h"
 #include "sntp.h"
 #include "mainscene.h"
+#include "sht3x.h"
 
 #define TAG "NOTE"
 
@@ -36,6 +37,7 @@ void Task_Routine(void *arg)
 
     //需要定时处理的操作
     xTaskCreate(Task_Http,"Http",4096*2,NULL,5,NULL);
+    xTaskCreate(Task_SHT3x,"STH3x",4096,NULL,4,NULL);
     SNTP_init();
 
     uint32_t count=0;

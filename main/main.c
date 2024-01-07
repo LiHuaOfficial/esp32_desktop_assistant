@@ -182,6 +182,7 @@ static void guiTask(void *pvParameter)
     xTaskCreate(Task_Routine,"Routine",4096,NULL,configMAX_PRIORITIES,NULL);
 
     xTaskCreate(Task_WifiInit,"Wifi",4096*2,NULL,WIFI_PRIORTY,&TaskHandle_Wifi);
+    
     while (1)
     {
         /* Delay 1 tick (assumes FreeRTOS tick is 10ms */
