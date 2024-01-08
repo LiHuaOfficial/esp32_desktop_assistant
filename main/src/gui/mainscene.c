@@ -18,6 +18,7 @@ extern lv_indev_t * indev_keypad;
 lv_obj_t* obj_weather;
 lv_obj_t* obj_time;
 lv_obj_t* obj_temperature;
+
 static void MenuEnter_Handler(lv_event_t* e);
 
 //这个任务将在app_main的gui_task中被创建
@@ -81,7 +82,7 @@ void Task_MainScene(void * arg){
     obj_weather=lv_obj_create(mainScene);
     lv_obj_clear_flag(obj_weather,LV_OBJ_FLAG_SCROLLABLE);
     
-    lv_obj_set_size(obj_weather,120,65);//
+    lv_obj_set_size(obj_weather,140,65);//
     lv_obj_align_to(obj_weather,obj_time,LV_ALIGN_OUT_BOTTOM_LEFT,0,0);
 
     lv_obj_t* label_temperature=lv_label_create(obj_weather);
@@ -90,7 +91,7 @@ void Task_MainScene(void * arg){
     lv_obj_t* label_weather=lv_label_create(obj_weather);
     lv_obj_align_to(label_weather,label_temperature,LV_ALIGN_OUT_BOTTOM_LEFT,0,0);
     lv_label_set_long_mode(label_weather,LV_LABEL_LONG_SCROLL_CIRCULAR);
-    lv_obj_set_width(label_weather,50);
+    lv_obj_set_width(label_weather,65);
 
     lv_obj_t* img_weatherLogo=lv_img_create(obj_weather);
     lv_obj_align(img_weatherLogo,LV_ALIGN_TOP_RIGHT,9,-2);
@@ -102,6 +103,24 @@ void Task_MainScene(void * arg){
     lv_label_set_text(label_temperature,"None");
 
     //温度框
+    obj_temperature=lv_obj_create(mainScene);
+    lv_obj_set_size(obj_temperature,100,65);
+    lv_obj_align_to(obj_temperature,obj_time,LV_ALIGN_OUT_BOTTOM_RIGHT,0,0);
+    lv_obj_clear_flag(obj_temperature,LV_OBJ_FLAG_SCROLLABLE);
+
+    lv_obj_t* label_indoorText=lv_label_create(obj_temperature);
+    lv_obj_align(label_indoorText,LV_ALIGN_TOP_LEFT,-10,-12);
+    lv_label_set_text(label_indoorText,"Indoor");
+
+    lv_obj_t* label_indoorTemperature=lv_label_create(obj_temperature);
+    lv_obj_align_to(label_indoorTemperature,label_indoorText,LV_ALIGN_OUT_BOTTOM_LEFT,0,0);
+    lv_obj_set_style_text_font(label_indoorTemperature,&lv_font_montserrat_26,LV_PART_MAIN);
+    lv_label_set_text(label_indoorTemperature,"None");
+    
+    lv_obj_t* label_humidity=lv_label_create(obj_temperature);
+    lv_obj_align_to(label_humidity,label_indoorTemperature,LV_ALIGN_OUT_BOTTOM_LEFT,0,0);
+    //lv_label_set_text(label_humidity,"");
+
     lv_obj_move_foreground(btn_setup);
     xSemaphoreGive(xGuiSemaphore);
 

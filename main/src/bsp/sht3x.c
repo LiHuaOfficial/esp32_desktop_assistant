@@ -43,7 +43,7 @@ static void SHT3x_WriteCommand(uint16_t data,bool needStop){
     }
 
     err=i2c_master_cmd_begin(I2C_NUM_0,cmd,100);
-    if(err!=ESP_OK) ESP_LOGE(TAG,"in write cmd:%s",esp_err_to_name(err)); 
+    if(err!=ESP_OK) ESP_LOGE(TAG,"in write cmd:%s current cmd:%x",esp_err_to_name(err),data); 
     i2c_cmd_link_delete(cmd);
 } 
 
@@ -73,7 +73,7 @@ static uint8_t CRC_Check(uint8_t *check_data,uint8_t num,uint8_t check_crc)
 }
 
 //只有两种数据返回，温湿度和寄存器
-static bool SHT3x_ReadTempAndHumid(){
+static bool SHT3x_ReadTempAndHumid(float* temp,float* humi){
     SHT3x_WriteCommand(0xe000,false);
     vTaskDelay(5);
 
@@ -93,12 +93,12 @@ static bool SHT3x_ReadTempAndHumid(){
     humidity   =((resultBuffer[3]<<8)|resultBuffer[4]);
 
     //CRC校验
-    float finalTemp,finalHumi;
+    //float finalTemp,finalHumi;
     if(CRC_Check(resultBuffer,2,resultBuffer[2]) && CRC_Check(resultBuffer+3,2,resultBuffer[5])){
-        finalTemp=temperature/65535.0*175-45;
-        finalHumi=humidity/65535.0*100;
+        *temp=temperature/65535.0*175-45;
+        *humi=humidity/65535.0*100;
 
-        ESP_LOGI(TAG,"temp:%.1f humi:%.1f",finalTemp,finalHumi);
+        ESP_LOGI(TAG,"temp:%.1f humi:%.1f",*temp,*humi);
         return true;
     }else{
         
@@ -115,15 +115,33 @@ void SHT3x_Init(){
 }
 
 ////////////以下非BSP部分，方便分类把Task_SHT3x也放在下面/////////////
+#include "lvgl.h"
+#include "mainscene.h"
+
+extern SemaphoreHandle_t xGuiSemaphore;
 
 void Task_SHT3x(void *args)
 {
+    float temperature,humidity;
     SHT3x_Init();
 
     while (1)
     {
         vTaskDelay(1000);
-        SHT3x_ReadTempAndHumid();
+        if (SHT3x_ReadTempAndHumid(&temperature,&humidity))
+        {
+            char buf[10];
+            
+            xSemaphoreTake(xGuiSemaphore,portMAX_DELAY);
+            /*set_text_fmt读不了float*/
+            sprintf(buf,"%.1f°C",temperature);
+            //printf("%s",buf);
+            lv_label_set_text(lv_obj_get_child(obj_temperature,1),buf);
+            sprintf(buf,"%.1f%%RH",humidity);
+            //printf("%s",buf);
+            lv_label_set_text(lv_obj_get_child(obj_temperature,2),buf);
+            xSemaphoreGive(xGuiSemaphore);
+        }
     }
     
 }

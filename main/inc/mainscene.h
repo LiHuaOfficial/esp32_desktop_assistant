@@ -9,7 +9,7 @@ extern "C"{
 
 extern lv_obj_t* obj_weather;
 extern lv_obj_t* obj_time;
-
+extern lv_obj_t* obj_temperature;
 void Task_MainScene(void * arg);
 
 /// @brief 根据输入更改天气图片
