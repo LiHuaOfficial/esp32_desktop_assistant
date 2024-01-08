@@ -17,6 +17,7 @@ extern lv_indev_t * indev_keypad;
 
 lv_obj_t* obj_weather;
 lv_obj_t* obj_time;
+lv_obj_t* obj_temperature;
 static void MenuEnter_Handler(lv_event_t* e);
 
 //这个任务将在app_main的gui_task中被创建
@@ -100,6 +101,7 @@ void Task_MainScene(void * arg){
     lv_label_set_text(label_weather,    "None");
     lv_label_set_text(label_temperature,"None");
 
+    //温度框
     lv_obj_move_foreground(btn_setup);
     xSemaphoreGive(xGuiSemaphore);
 

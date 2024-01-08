@@ -126,7 +126,6 @@ void Task_SetupScene(void* arg){
     currentSubMenu=SubMenu_Menu1_Create();//创建默认菜单
     xSemaphoreGive(xGuiSemaphore);
 
-    printf("inSetupScene:%lu\n",uxTaskGetStackHighWaterMark2(xTaskGetCurrentTaskHandle()));
     vTaskDelete(xTaskGetCurrentTaskHandle());
 }
 
