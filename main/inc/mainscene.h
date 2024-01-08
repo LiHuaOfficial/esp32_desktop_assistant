@@ -10,7 +10,7 @@ extern "C"{
 extern lv_obj_t* obj_weather;
 extern lv_obj_t* obj_time;
 extern lv_obj_t* obj_temperature;
-void Task_MainScene(void * arg);
+void MainScene_Create(void);
 
 /// @brief 根据输入更改天气图片
 /// @param code JSON文件中每种天气都有的id

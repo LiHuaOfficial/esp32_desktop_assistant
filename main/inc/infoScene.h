@@ -5,7 +5,7 @@
 extern "C"{
 #endif
 
-
+void InfoScene_Create(void);
 
 #ifdef __cplusplus
 }

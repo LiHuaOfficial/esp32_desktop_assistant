@@ -17,7 +17,7 @@ typedef enum
     SUBMENU_TYPE_NOTHING
 } submenu_type_t;
 
-void Task_SetupScene(void* arg);
+void SetupScene_Create(void);
 
 /// @brief 生成菜单栏元素
 /// @param parent 指定其父页面

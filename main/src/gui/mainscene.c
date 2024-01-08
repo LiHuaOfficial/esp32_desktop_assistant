@@ -24,7 +24,7 @@ static void MenuEnter_Handler(lv_event_t* e);
 //这个任务将在app_main的gui_task中被创建
 //xPortGetCoreID();//拿这个函数获取当前任务运行的核心
 //调用所有lv_...函数都应保证互斥访问
-void Task_MainScene(void * arg){
+void MainScene_Create(void){
     xSemaphoreTake(xGuiSemaphore,portMAX_DELAY);
 
     lv_obj_t* btn_setup = lv_btn_create(mainScene);
@@ -77,7 +77,7 @@ void Task_MainScene(void * arg){
     lv_obj_set_style_text_font(label_time,&lv_font_montserrat_48,LV_PART_MAIN);
 
     lv_obj_t* label_date=lv_label_create(obj_time);
-    lv_obj_align_to(label_date,label_time,LV_ALIGN_OUT_BOTTOM_MID,-30,0);
+    lv_obj_align_to(label_date,label_time,LV_ALIGN_OUT_BOTTOM_MID,-35,0);
     //天气框
     obj_weather=lv_obj_create(mainScene);
     lv_obj_clear_flag(obj_weather,LV_OBJ_FLAG_SCROLLABLE);
@@ -123,9 +123,6 @@ void Task_MainScene(void * arg){
 
     lv_obj_move_foreground(btn_setup);
     xSemaphoreGive(xGuiSemaphore);
-
-    //printf("inMainScene:%lu\n",uxTaskGetStackHighWaterMark2(xTaskGetCurrentTaskHandle()));
-    vTaskDelete(NULL);
 }
 
 

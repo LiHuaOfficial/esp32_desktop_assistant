@@ -49,7 +49,7 @@ static lv_obj_t* SubMenu_Menu1_Create();
 static lv_obj_t* SubMenu_Menu2_Create();
 static lv_obj_t* SubMenu_WifiMenu_Create();
 
-void Task_SetupScene(void* arg){
+void SetupScene_Create(void){
 
     xSemaphoreTake(xGuiSemaphore,portMAX_DELAY);
     
@@ -125,8 +125,6 @@ void Task_SetupScene(void* arg){
     
     currentSubMenu=SubMenu_Menu1_Create();//创建默认菜单
     xSemaphoreGive(xGuiSemaphore);
-
-    vTaskDelete(xTaskGetCurrentTaskHandle());
 }
 
 //这个函数用于实现通过左上按钮显示&隐藏菜单栏的功能

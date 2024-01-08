@@ -44,6 +44,7 @@
 #include "setupscene.h"
 #include "myWifi.h"
 #include "status_routine.h"
+#include "infoScene.h"
 
 /*********************
  *      DEFINES
@@ -176,8 +177,10 @@ static void guiTask(void *pvParameter)
     mainScene=lv_scr_act();
     setupScene=lv_obj_create(NULL);
     infoScene=lv_obj_create(NULL);
-    xTaskCreatePinnedToCore(Task_MainScene,"MainScene",4096*2,NULL,GUI_PRIORITY,&TaskHandle_MainScene,1);
-    xTaskCreatePinnedToCore(Task_SetupScene,"SetupScene",4096*2,NULL,GUI_PRIORITY,&TaskHandle_SetupScene,1);
+    //调用屏幕的构造函数
+    MainScene_Create();
+    SetupScene_Create();
+    InfoScene_Create();
 
     xTaskCreate(Task_Routine,"Routine",4096,NULL,configMAX_PRIORITIES,NULL);
 
