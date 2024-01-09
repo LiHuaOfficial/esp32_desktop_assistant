@@ -15,7 +15,7 @@
 #include "inputscene.h"
 #include "status_routine.h"
 
-#define MENU_BTN_NUM 8
+#define MENU_BTN_NUM 3
 
 
 
@@ -34,9 +34,9 @@ extern lv_indev_t * indev_keypad;
 static lv_style_t style_menuObj;//这个样式将用于所有的菜单选项
 static lv_style_t style_menuBtn;
 
-static lv_obj_t* currentSubMenu=NULL;
+lv_obj_t* currentSubMenu=NULL;
 
-const char* text_btnMenu[MENU_BTN_NUM] = { "Return to main","menu1","menu2","Wifi","menu4"};
+const char* text_btnMenu[MENU_BTN_NUM] = { "Return to main","City","Wifi"};
 
 static void Btn_ShowMenu_Handler(lv_event_t *e);
 static void BtnMenu_Handler(lv_event_t* e);
@@ -45,8 +45,7 @@ static void AnimMenu_Handler(void* var, int32_t v);
 
 //widget包括label和固定类型
 
-static lv_obj_t* SubMenu_Menu1_Create();
-static lv_obj_t* SubMenu_Menu2_Create();
+static lv_obj_t* SubMenu_City_Create();
 static lv_obj_t* SubMenu_WifiMenu_Create();
 
 void SetupScene_Create(void){
@@ -83,7 +82,7 @@ void SetupScene_Create(void){
     //显示主菜单的按钮
     lv_obj_t* btn_showMenu = lv_btn_create(setupScene);
     lv_obj_t* label_btn_showMenu = lv_label_create(btn_showMenu);
-    lv_label_set_text(label_btn_showMenu, "Menu");
+    lv_label_set_text(label_btn_showMenu, "Close");
     lv_obj_add_flag(btn_showMenu,LV_OBJ_FLAG_CHECKABLE);
     
     lv_obj_update_layout(btn_showMenu);
@@ -94,8 +93,8 @@ void SetupScene_Create(void){
     lv_obj_set_style_radius(widget_menu, 0, 0);
     lv_obj_set_flex_flow(widget_menu, LV_FLEX_FLOW_COLUMN);
     
-
-    lv_obj_add_flag(widget_menu, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_state(btn_showMenu,LV_STATE_CHECKED);
+    lv_obj_set_x(widget_menu,0);
 
     lv_obj_update_layout(widget_menu);
     //框内功能按钮
@@ -123,7 +122,7 @@ void SetupScene_Create(void){
 
     lv_obj_add_style(btn_showMenu, &style_menuObj, LV_PART_MAIN);
     
-    currentSubMenu=SubMenu_Menu1_Create();//创建默认菜单
+
     xSemaphoreGive(xGuiSemaphore);
 }
 
@@ -180,8 +179,6 @@ void BtnMenu_Handler(lv_event_t* e)
 {
     uint16_t btnIndex = (uint16_t)lv_event_get_user_data(e);
 
-    printf("current btn index:%u\n", btnIndex);
-
     /*暂时采用每次选择
     都重新创建组件的方式
     保留父组件指针下次选择删除*/
@@ -201,20 +198,12 @@ void BtnMenu_Handler(lv_event_t* e)
         // lv_indev_set_group(indev_keypad,group_mainScene);
         break;
     case 1:
-        currentSubMenu=SubMenu_Menu1_Create();
+        currentSubMenu=SubMenu_City_Create();
         break;
     case 2:
-        currentSubMenu = SubMenu_Menu2_Create();
-        break;
-    case 3:
         currentSubMenu =SubMenu_WifiMenu_Create();
         break;
     default:
-        if (currentSubMenu) {
-            //lv_group_remove_obj(currentSubMenu);
-            lv_obj_del(currentSubMenu);
-            currentSubMenu = NULL;
-        }
         printf("no implements\n");
         break;
     }
@@ -278,10 +267,11 @@ lv_obj_t* SubMenu_Stuff_Create(lv_obj_t* parent,const char* text,const char* obj
         stuff=lv_label_create(widget);
         if(objText) lv_label_set_text(stuff,objText);
         
-        if(strcmp(text,LV_SYMBOL_WIFI)==0){
+        //直接把回调函数加给大框
+        if(stuff_event_cb){
             lv_obj_add_flag(widget,LV_OBJ_FLAG_CLICKABLE);//在wifi中可以选中
             lv_obj_add_event_cb(widget,stuff_event_cb,LV_EVENT_ALL,NULL);
-        } 
+        }
         break;
     default:
         break;
@@ -296,38 +286,26 @@ lv_obj_t* SubMenu_Stuff_Create(lv_obj_t* parent,const char* text,const char* obj
 }
 
 /*具体菜单的创建*/
-
-lv_obj_t* SubMenu_Menu1_Create()
-{
-    lv_obj_t* subMenu=lv_obj_create(setupScene);
-    lv_obj_set_style_bg_color(subMenu, lv_color_darken(lv_color_hex(0xffffff), LV_OPA_10), 0);
-    lv_obj_set_style_border_width(subMenu, 0, 0);
-    lv_obj_set_size(subMenu, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
-    lv_obj_set_y(subMenu, 30);
-    lv_obj_move_background(subMenu);
-
-    lv_obj_set_flex_flow(subMenu, LV_FLEX_FLOW_COLUMN);
-
-    SubMenu_Stuff_Create(subMenu, "A slider",NULL, SUBMENU_TYPE_SLIDER, NULL, 0,NULL);
-    SubMenu_Stuff_Create(subMenu, "A switch",NULL, SUBMENU_TYPE_SWITCH, NULL, 0,NULL);
-
-
-    return subMenu;
+void CityMenu_Click_Handler(lv_event_t* e){
+    lv_event_code_t code=lv_event_get_code(e);
+    
+    if(code==LV_EVENT_CLICKED){
+        //显示inputScene
+        InputScene_Show(INPUT_CB_CITY,NULL);
+    }
 }
 
-lv_obj_t* SubMenu_Menu2_Create()
-{
+lv_obj_t* SubMenu_City_Create(){
     lv_obj_t* subMenu = lv_obj_create(setupScene);
     lv_obj_set_style_bg_color(subMenu, lv_color_darken(lv_color_hex(0xffffff), LV_OPA_10), 0);
     lv_obj_set_style_border_width(subMenu, 0, 0);
     lv_obj_set_size(subMenu, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
     lv_obj_set_y(subMenu, 30);
     lv_obj_move_background(subMenu);
-
     lv_obj_set_flex_flow(subMenu, LV_FLEX_FLOW_COLUMN);
 
-    SubMenu_Stuff_Create(subMenu, "A checkbox",NULL,SUBMENU_TYPE_CHECKBOX, NULL, 0,NULL);
-
+    SubMenu_Stuff_Create(subMenu,"Current city",lv_label_get_text(lv_obj_get_child(common_status.obj_statusBar,3)),SUBMENU_TYPE_LABEL,NULL,0,0);
+    SubMenu_Stuff_Create(subMenu,"Click Here to Modify City" ," ",SUBMENU_TYPE_LABEL,CityMenu_Click_Handler,0,NULL);
     return subMenu;
 }
 

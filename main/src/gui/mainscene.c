@@ -125,13 +125,9 @@ void MainScene_Create(void){
     xSemaphoreGive(xGuiSemaphore);
 }
 
-
 void MenuEnter_Handler(lv_event_t *e)
 {
-    //xSemaphoreTake(xGuiSemaphore,portMAX_DELAY);
     lv_scr_load_anim(setupScene,LV_SCR_LOAD_ANIM_MOVE_RIGHT,200,50,false);
-    //lv_indev_set_group(indev_keypad,group_setupScene_default);
-    //xSemaphoreGive(xGuiSemaphore);
 }
 
 //https://docs.seniverse.com/api/start/code.html

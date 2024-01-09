@@ -99,6 +99,9 @@ void Touchpad_Read_Callback(lv_indev_drv_t * indev_drv, lv_indev_data_t * data){
 
 }
 
+extern lv_obj_t* currentSubMenu;
+extern lv_obj_t* inputScene;
+
 void InputFeedback_Callback(lv_indev_drv_t* indev_drv,uint8_t eventType){
     if(eventType==LV_EVENT_LONG_PRESSED){
         //通过按键模拟触控板时，只有引起长按事件的按钮才会触发
@@ -108,11 +111,18 @@ void InputFeedback_Callback(lv_indev_drv_t* indev_drv,uint8_t eventType){
         if(lv_scr_act()==mainScene){
             lv_scr_load_anim(infoScene,LV_SCR_LOAD_ANIM_FADE_ON,500,100,false);
             lv_obj_set_parent(common_status.obj_statusBar,infoScene);
-        }else if(lv_scr_act()==infoScene){
+        }else{
+            //在其他页面时长按直接跳转主界面
+            if(currentSubMenu!=NULL) {
+                lv_obj_del(currentSubMenu);
+                currentSubMenu=NULL;
+            }//防止内存泄漏！！！
+            if(inputScene!=NULL){
+                lv_obj_del(inputScene);
+                inputScene=NULL;
+            }
             lv_scr_load_anim(mainScene,LV_SCR_LOAD_ANIM_FADE_ON,500,100,false);
             lv_obj_set_parent(common_status.obj_statusBar,mainScene);
-        }else{
-
         }
     }
 }
