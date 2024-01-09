@@ -31,6 +31,7 @@ void Task_Http(void* arg)
         vTaskDelay(HTTP_REQUST_INTERVAL_MS/portTICK_PERIOD_MS);
         if(common_status.wifi==true){
             Http_get_from_url();
+            //printf("inHttp:%lu\n",uxTaskGetStackHighWaterMark2(xTaskGetCurrentTaskHandle()));
         }
     }
 }
@@ -93,8 +94,8 @@ void Http_get_from_url()
         cJSON* json_obj_code=cJSON_GetObjectItem(json_obj_now,"code");
         xSemaphoreTake(xGuiSemaphore,portMAX_DELAY);
         lv_label_set_text_fmt(lv_obj_get_child(common_status.obj_statusBar,3),"%s",json_obj_name->valuestring);
-        lv_label_set_text_fmt(lv_obj_get_child(obj_weather,0),"%s",json_obj_text->valuestring);
-        lv_label_set_text_fmt(lv_obj_get_child(obj_weather,1),"%s°C",json_obj_temperature->valuestring);
+        lv_label_set_text_fmt(lv_obj_get_child(obj_weather,1),"%s",json_obj_text->valuestring);
+        lv_label_set_text_fmt(lv_obj_get_child(obj_weather,0),"%s°C",json_obj_temperature->valuestring);
         MainScene_FindImg(json_obj_code->valuestring);
         xSemaphoreGive(xGuiSemaphore);
 

@@ -4,12 +4,20 @@
 
 #include "lvgl.h"
 
+#include "status_routine.h"
+
 lv_indev_t * indev_keypad;
 lv_indev_t* indev_touchpad;
+
+extern lv_obj_t* infoScene;
+extern lv_obj_t* mainScene;
+extern lv_obj_t* setupScene;
 
 static void Touchpad_Init(void);
 
 static void Touchpad_Read_Callback(lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
+
+static void InputFeedback_Callback(lv_indev_drv_t* indev_drv,uint8_t eventType);
 
 void lv_port_indev_init(void){
     static lv_indev_drv_t indev_drv;//static防止可能lvgl库中还要使用
@@ -27,21 +35,10 @@ void lv_port_indev_init(void){
     lv_indev_drv_init(&indev_drv);
     indev_drv.type=LV_INDEV_TYPE_POINTER;
     indev_drv.read_cb=Touchpad_Read_Callback;
-
+    indev_drv.feedback_cb=InputFeedback_Callback;
     indev_touchpad=lv_indev_drv_register(&indev_drv);
 }
 
-//esp32输入初始化
-// static void Keypad_Init(void){
-//     gpio_set_direction(GPIO_PIN_UPPER,GPIO_MODE_INPUT);
-//     gpio_set_pull_mode(GPIO_PIN_UPPER,GPIO_PULLUP_ONLY);
-
-//     gpio_set_direction(GPIO_PIN_MID,GPIO_MODE_INPUT);
-//     gpio_set_pull_mode(GPIO_PIN_MID,GPIO_PULLUP_ONLY);
-
-//     gpio_set_direction(GPIO_PIN_LOWER,GPIO_MODE_INPUT);
-//     gpio_set_pull_mode(GPIO_PIN_LOWER,GPIO_PULLUP_ONLY);
-// }
 
 void Touchpad_Init(void){
     gpio_set_direction(GPIO_PIN_UP,GPIO_MODE_INPUT);
@@ -59,48 +56,6 @@ void Touchpad_Init(void){
     gpio_set_direction(GPIO_PIN_RIGHT,GPIO_MODE_INPUT);
     gpio_set_pull_mode(GPIO_PIN_RIGHT,GPIO_PULLUP_ONLY);
 }
-
-// static uint32_t Keypad_GetKey(void){
-//     //未按下返回0，其余返回上中下对应1、2、3
-//     if(gpio_get_level(GPIO_PIN_UPPER)==0){
-//         return 1;
-//     }else if(gpio_get_level(GPIO_PIN_MID)==0){
-//         return 2;
-//     }else if(gpio_get_level(GPIO_PIN_LOWER)==0){
-//         return 3;
-//     }
-//     return 0;
-// }
-
-//该函数会被Lvgl库定时调用
-// static void Keypad_Read_Callback(lv_indev_drv_t * indev_drv, lv_indev_data_t * data){
-//     static uint32_t last_key=0;
-
-//     uint32_t act_key=Keypad_GetKey();
-
-//     if(act_key != 0) {
-//         data->state = LV_INDEV_STATE_PR;
-
-//         /*Translate the keys to LVGL control characters according to your key definitions*/
-//         switch(act_key) {
-//         case 1:
-//             act_key = LV_KEY_LEFT;//UPPER
-//             break;
-//         case 2:
-//             act_key = LV_KEY_ENTER;//MID
-//             break;
-//         case 3:
-//             act_key = LV_KEY_RIGHT;//LOWER
-//             break;
-//         }
-
-//         last_key = act_key;
-//     } else {
-//         data->state = LV_INDEV_STATE_REL;
-//     }
-
-//     data->key = last_key;    
-// }
 
 static uint8_t Touchpad_GetKey(){
     //为了检测多个按键，采用压位表示按下的按键
@@ -142,5 +97,33 @@ void Touchpad_Read_Callback(lv_indev_drv_t * indev_drv, lv_indev_data_t * data){
     data->point.x=lastX;
     data->point.y=lastY;
 
+}
+
+extern lv_obj_t* currentSubMenu;
+extern lv_obj_t* inputScene;
+
+void InputFeedback_Callback(lv_indev_drv_t* indev_drv,uint8_t eventType){
+    if(eventType==LV_EVENT_LONG_PRESSED){
+        //通过按键模拟触控板时，只有引起长按事件的按钮才会触发
+        //keypad可以尝试在indev_drv的user data记录按键
+
+        //实现在主页面长按跳转信息页面,以及反之
+        if(lv_scr_act()==mainScene){
+            lv_scr_load_anim(infoScene,LV_SCR_LOAD_ANIM_FADE_ON,500,100,false);
+            lv_obj_set_parent(common_status.obj_statusBar,infoScene);
+        }else{
+            //在其他页面时长按直接跳转主界面
+            if(currentSubMenu!=NULL) {
+                lv_obj_del(currentSubMenu);
+                currentSubMenu=NULL;
+            }//防止内存泄漏！！！
+            if(inputScene!=NULL){
+                lv_obj_del(inputScene);
+                inputScene=NULL;
+            }
+            lv_scr_load_anim(mainScene,LV_SCR_LOAD_ANIM_FADE_ON,500,100,false);
+            lv_obj_set_parent(common_status.obj_statusBar,mainScene);
+        }
+    }
 }
 

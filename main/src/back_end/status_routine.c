@@ -10,6 +10,7 @@
 #include "http.h"
 #include "sntp.h"
 #include "mainscene.h"
+#include "sht3x.h"
 
 #define TAG "NOTE"
 
@@ -24,6 +25,8 @@ Common_status common_status={
     .menu_wifi_switch=false
 };
 
+const char dates[][5]={"Sun","Mon","Tue","Wed","Thur","Fri","Sat"};
+
 static void Generate_NoteWidget(char* noteText);
 
 void Task_MyEventHandle(void* arg);
@@ -33,28 +36,34 @@ void Task_Routine(void *arg)
     xTaskCreate(Task_MyEventHandle,"MyEvent",4096,NULL,configMAX_PRIORITIES,NULL);
 
     //需要定时处理的操作
-    xTaskCreate(Task_Http,"Http",4096*3,NULL,5,NULL);
+    xTaskCreate(Task_Http,"Http",4096*2,NULL,5,NULL);
+    xTaskCreate(Task_SHT3x,"STH3x",4096,NULL,4,NULL);
     SNTP_init();
 
     uint32_t count=0;
-    vTaskDelay(pdMS_TO_TICKS(800));
+    
     if(common_status.wifi) SNTP_Update();//先更新一次
+    vTaskDelay(pdMS_TO_TICKS(800));
     while (1)
     {
         count++;
         //每秒更新一次时间
         struct tm currentTime=SNTP_GetTime();//如此传参效率较低
         xSemaphoreTake(xGuiSemaphore,portMAX_DELAY);
-        lv_label_set_text_fmt(lv_obj_get_child(obj_time,0),"%02d:%02d:%02d",(currentTime.tm_hour+8)%24,currentTime.tm_min,currentTime.tm_sec);//时间
-        lv_label_set_text_fmt(lv_obj_get_child(obj_time,1),"%d/%02d/%02d",currentTime.tm_year+1900,currentTime.tm_mon+1,currentTime.tm_mday);//日期
+        lv_label_set_text_fmt(lv_obj_get_child(obj_time,0),"%02d:%02d:%02d",
+                              (currentTime.tm_hour+8)%24,currentTime.tm_min,currentTime.tm_sec);//时间
+        lv_label_set_text_fmt(lv_obj_get_child(obj_time,1),"%d/%02d/%02d %s",
+                              currentTime.tm_year+1900,currentTime.tm_mon+1,currentTime.tm_mday,dates[currentTime.tm_wday]);//日期
         xSemaphoreGive(xGuiSemaphore);        
         //如果没有手动关闭wifi，应当重连
         /*真的必要吗？？？*/
         
         //每分钟进行一次网络对时
-        if(count==ROUTINE_UPDATE_NETWORK_TIME_S){
+        if(count%ROUTINE_UPDATE_NETWORK_TIME_S==0){
             if(common_status.wifi) SNTP_Update();
+            //printf("inRoutine:%lu\n",uxTaskGetStackHighWaterMark2(xTaskGetCurrentTaskHandle()));
         }
+
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
     
@@ -85,6 +94,8 @@ void Task_MyEventHandle(void* arg){
             ESP_LOGI(TAG,"Wifi Connect Failed");
             Generate_NoteWidget("Wifi Connect Failed");
         }
+
+        //printf("inEvent:%lu\n",uxTaskGetStackHighWaterMark2(xTaskGetCurrentTaskHandle()));
     }
 }
 

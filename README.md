@@ -1,11 +1,14 @@
 # ESP32桌面助手
-esp32配合lvgl实现的简单桌面助手
+esp32配合lvgl实现的简单桌面助手 
+
+基于esp-idf v5.1.1 & LVGL v8.2.1
 
 目前实现的功能
 + 按键输入（上下左右&确定）
 + 主页面
     + 显示天气（从心知天气获取JSON并解析）
     + 显示时间&日期（通过NTP服务器对时）
+    + 基于SHT30显示室内温湿度
 + 设置界面
     + 连接Wifi
 + 全局的消息提示
@@ -52,9 +55,10 @@ gpio_set_direction(XXXX_DC, GPIO_MODE_OUTPUT);
 同样在esp_lcd_backlight.c中修改GPIO的初始化，如果不使用pwm控制的话将背光IO直接置高电平即可
 
 + ### 修改IDF.PY menuconfig
-将其中的LVGL configuration中color项内的Images pixels with this color will not be drawn项改为0x0000，使得图片不显示黑边
-（生成时颜色格式为CF_TRUE_COLOR_CHROMA，LVGL将不会渲染为0x0000的像素） 
-
+    + **LVGL** 将其中的LVGL configuration中color项内的**Images pixels with this color will not be drawn**项改为0x0000，使得图片不显示黑边        
+    （生成时颜色格式为CF_TRUE_COLOR_CHROMA，LVGL将不会渲染为0x0000的像素）
+    + **LVGL** 启用内置字体 **Montserrat14、30、48**
+    + **ESP Components** 打开ESP-TLS中的**Skip server certification**
 ## 可能出现的问题
 + ### 找不到头文件
 将.vscode\c_cpp_properties.json中的"compilerPath"更改为ESP-IDF build project时显示的编译器路径即可

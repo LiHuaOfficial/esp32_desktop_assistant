@@ -14,6 +14,7 @@ extern "C"{
 
 typedef enum{
     INPUT_CB_WIFI_PWD,
+    INPUT_CB_CITY,
     INPUT_CB_NONE
 }input_cb_type;
 

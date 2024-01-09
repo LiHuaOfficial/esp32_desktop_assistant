@@ -17,12 +17,14 @@ extern lv_indev_t * indev_keypad;
 
 lv_obj_t* obj_weather;
 lv_obj_t* obj_time;
+lv_obj_t* obj_temperature;
+
 static void MenuEnter_Handler(lv_event_t* e);
 
 //这个任务将在app_main的gui_task中被创建
 //xPortGetCoreID();//拿这个函数获取当前任务运行的核心
 //调用所有lv_...函数都应保证互斥访问
-void Task_MainScene(void * arg){
+void MainScene_Create(void){
     xSemaphoreTake(xGuiSemaphore,portMAX_DELAY);
 
     lv_obj_t* btn_setup = lv_btn_create(mainScene);
@@ -69,27 +71,30 @@ void Task_MainScene(void * arg){
     lv_obj_clear_flag(obj_time,LV_OBJ_FLAG_SCROLLABLE);
     //lv_obj_set_pos(obj_time,0,20);
     lv_obj_align(obj_time,LV_ALIGN_TOP_MID,0,20);
-    lv_obj_set_size(obj_time,230,90);
+    lv_obj_set_size(obj_time,240,90);
     lv_obj_t* label_time=lv_label_create(obj_time);
     lv_obj_align(label_time,LV_ALIGN_TOP_MID,0,0);
-    lv_obj_set_style_text_font(label_time,&lv_font_montserrat_48,0);
+    lv_obj_set_style_text_font(label_time,&lv_font_montserrat_48,LV_PART_MAIN);
 
     lv_obj_t* label_date=lv_label_create(obj_time);
-    lv_obj_align_to(label_date,label_time,LV_ALIGN_OUT_BOTTOM_MID,-20,0);
+    lv_obj_align_to(label_date,label_time,LV_ALIGN_OUT_BOTTOM_MID,-35,0);
     //天气框
     obj_weather=lv_obj_create(mainScene);
     lv_obj_clear_flag(obj_weather,LV_OBJ_FLAG_SCROLLABLE);
     
-    lv_obj_set_size(obj_weather,200,80);
-    lv_obj_align_to(obj_weather,obj_time,LV_ALIGN_OUT_BOTTOM_MID,0,0);
+    lv_obj_set_size(obj_weather,140,65);//
+    lv_obj_align_to(obj_weather,obj_time,LV_ALIGN_OUT_BOTTOM_LEFT,0,0);
 
-    lv_obj_t* label_weather=lv_label_create(obj_weather);
-    lv_obj_align(label_weather,LV_ALIGN_TOP_LEFT,0,0);
     lv_obj_t* label_temperature=lv_label_create(obj_weather);
-    lv_obj_align_to(label_temperature,label_weather,LV_ALIGN_OUT_BOTTOM_MID,0,0);
+    lv_obj_align(label_temperature,LV_ALIGN_TOP_LEFT,-10,-5);
+    lv_obj_set_style_text_font(label_temperature,&lv_font_montserrat_26,LV_PART_MAIN);
+    lv_obj_t* label_weather=lv_label_create(obj_weather);
+    lv_obj_align_to(label_weather,label_temperature,LV_ALIGN_OUT_BOTTOM_LEFT,0,0);
+    lv_label_set_long_mode(label_weather,LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_obj_set_width(label_weather,65);
 
     lv_obj_t* img_weatherLogo=lv_img_create(obj_weather);
-    lv_obj_align(img_weatherLogo,LV_ALIGN_TOP_RIGHT,0,0);
+    lv_obj_align(img_weatherLogo,LV_ALIGN_TOP_RIGHT,9,-2);
 
     lv_label_set_long_mode(label_weather,LV_LABEL_LONG_SCROLL_CIRCULAR);
     lv_label_set_long_mode(label_temperature,LV_LABEL_LONG_SCROLL_CIRCULAR);
@@ -97,19 +102,32 @@ void Task_MainScene(void * arg){
     lv_label_set_text(label_weather,    "None");
     lv_label_set_text(label_temperature,"None");
 
+    //温度框
+    obj_temperature=lv_obj_create(mainScene);
+    lv_obj_set_size(obj_temperature,100,65);
+    lv_obj_align_to(obj_temperature,obj_time,LV_ALIGN_OUT_BOTTOM_RIGHT,0,0);
+    lv_obj_clear_flag(obj_temperature,LV_OBJ_FLAG_SCROLLABLE);
+
+    lv_obj_t* label_indoorText=lv_label_create(obj_temperature);
+    lv_obj_align(label_indoorText,LV_ALIGN_TOP_LEFT,-10,-12);
+    lv_label_set_text(label_indoorText,"Indoor");
+
+    lv_obj_t* label_indoorTemperature=lv_label_create(obj_temperature);
+    lv_obj_align_to(label_indoorTemperature,label_indoorText,LV_ALIGN_OUT_BOTTOM_LEFT,0,0);
+    lv_obj_set_style_text_font(label_indoorTemperature,&lv_font_montserrat_26,LV_PART_MAIN);
+    lv_label_set_text(label_indoorTemperature,"None");
+    
+    lv_obj_t* label_humidity=lv_label_create(obj_temperature);
+    lv_obj_align_to(label_humidity,label_indoorTemperature,LV_ALIGN_OUT_BOTTOM_LEFT,0,0);
+    //lv_label_set_text(label_humidity,"");
+
     lv_obj_move_foreground(btn_setup);
     xSemaphoreGive(xGuiSemaphore);
-
-    vTaskDelete(NULL);
 }
-
 
 void MenuEnter_Handler(lv_event_t *e)
 {
-    //xSemaphoreTake(xGuiSemaphore,portMAX_DELAY);
     lv_scr_load_anim(setupScene,LV_SCR_LOAD_ANIM_MOVE_RIGHT,200,50,false);
-    //lv_indev_set_group(indev_keypad,group_setupScene_default);
-    //xSemaphoreGive(xGuiSemaphore);
 }
 
 //https://docs.seniverse.com/api/start/code.html
