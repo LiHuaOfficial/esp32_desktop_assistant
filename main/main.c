@@ -45,6 +45,7 @@
 #include "myWifi.h"
 #include "status_routine.h"
 #include "infoScene.h"
+#include "my_nvs.h"
 
 /*********************
  *      DEFINES
@@ -115,6 +116,8 @@ void app_main()
     if (ret != ESP_OK) ESP_LOGE(TAG, "Failed to get SPIFFS partition information (%s)", esp_err_to_name(ret));
     else ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
 
+    //NVS init
+    
     //LED init
     gpio_set_direction(GPIO_NUM_32,GPIO_MODE_OUTPUT);
     gpio_set_level(GPIO_NUM_32,1);
