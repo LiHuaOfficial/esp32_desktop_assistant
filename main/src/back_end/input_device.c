@@ -36,6 +36,7 @@ void lv_port_indev_init(void){
     indev_drv.type=LV_INDEV_TYPE_POINTER;
     indev_drv.read_cb=Touchpad_Read_Callback;
     indev_drv.feedback_cb=InputFeedback_Callback;
+    indev_drv.long_press_time=800;
     indev_touchpad=lv_indev_drv_register(&indev_drv);
 }
 
@@ -55,6 +56,7 @@ void Touchpad_Init(void){
 
     gpio_set_direction(GPIO_PIN_RIGHT,GPIO_MODE_INPUT);
     gpio_set_pull_mode(GPIO_PIN_RIGHT,GPIO_PULLUP_ONLY);
+
 }
 
 static uint8_t Touchpad_GetKey(){
@@ -66,7 +68,6 @@ static uint8_t Touchpad_GetKey(){
     if(gpio_get_level(GPIO_PIN_DOWN)==0)    returnVal &=~(1<<2);
     if(gpio_get_level(GPIO_PIN_LEFT)==0)    returnVal &=~(1<<3);
     if(gpio_get_level(GPIO_PIN_RIGHT)==0)   returnVal &=~(1<<4);
-    
     return returnVal;
 }
 
@@ -80,15 +81,22 @@ void Touchpad_Read_Callback(lv_indev_drv_t * indev_drv, lv_indev_data_t * data){
 
     if(~returnVal & 1){
         data->state=LV_INDEV_STATE_PRESSED;
+        indev_drv->user_data=(void*)true;
     }
     else{
         data->state=LV_INDEV_STATE_RELEASED;
     }
 
-    if(~returnVal & (1<<1))//up
-        if(lastY-POINTER_MOVE_SCALE>=0) lastY-=POINTER_MOVE_SCALE;   
-    if(~returnVal & (1<<2))//down
+    if(~returnVal & (1<<1)){//up
+        if(lastY-POINTER_MOVE_SCALE>=0) lastY-=POINTER_MOVE_SCALE;
+        indev_drv->user_data=false;
+    }
+          
+    if(~returnVal & (1<<2)){//down
         if(lastY+POINTER_MOVE_SCALE<=lv_disp_get_ver_res(NULL)) lastY+=POINTER_MOVE_SCALE;
+        indev_drv->user_data=false;
+    }
+        
     if(~returnVal & (1<<3))//left
         if(lastX-POINTER_MOVE_SCALE>=0) lastX-=POINTER_MOVE_SCALE;
     if(~returnVal & (1<<4))//right
@@ -103,7 +111,7 @@ extern lv_obj_t* currentSubMenu;
 extern lv_obj_t* inputScene;
 
 void InputFeedback_Callback(lv_indev_drv_t* indev_drv,uint8_t eventType){
-    if(eventType==LV_EVENT_LONG_PRESSED){
+    if(eventType==LV_EVENT_LONG_PRESSED && (int)indev_drv->user_data==true){
         //通过按键模拟触控板时，只有引起长按事件的按钮才会触发
         //keypad可以尝试在indev_drv的user data记录按键
 
