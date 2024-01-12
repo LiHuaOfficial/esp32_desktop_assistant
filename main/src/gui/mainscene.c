@@ -121,6 +121,12 @@ void MainScene_Create(void){
     lv_obj_align_to(label_humidity,label_indoorTemperature,LV_ALIGN_OUT_BOTTOM_LEFT,0,0);
     //lv_label_set_text(label_humidity,"");
 
+    //小豆泥GIF
+    LV_IMG_DECLARE(azuki_array);
+    lv_obj_t* img_Azuki=lv_gif_create(mainScene);
+    lv_gif_set_src(img_Azuki,&azuki_array);//可能spiffs比较慢，卡得过分
+    lv_obj_align_to(img_Azuki,obj_temperature,LV_ALIGN_OUT_BOTTOM_LEFT,0,0);
+
     lv_obj_move_foreground(btn_setup);
     xSemaphoreGive(xGuiSemaphore);
 }

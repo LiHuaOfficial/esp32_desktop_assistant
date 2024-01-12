@@ -10,4 +10,4 @@ project(esp_desktop_assistant)
 #第一个参数指代分区表中文件夹名
 #第二个参数指代源文件夹路径
 #下载一次后可以注释之
-#spiffs_create_partition_image(storage resources FLASH_IN_PROJECT)
+spiffs_create_partition_image(storage resources FLASH_IN_PROJECT)

@@ -60,6 +60,7 @@ gpio_set_direction(XXXX_DC, GPIO_MODE_OUTPUT);
     + **LVGL** 启用内置字体 **Montserrat14、30、48**
     + **ESP Components** 打开ESP-TLS中的**Skip server certification**
     + 启用GIF_DECODER
+    + 将LVGL分配的内存调至64kb
 
 + ### 首次下载
     + 接触main目录下的spiffs_create_partition_image(storage resources FLASH_IN_PROJECT)注释
