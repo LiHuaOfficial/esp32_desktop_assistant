@@ -23,6 +23,7 @@
 #include "esp_timer.h"
 #include "esp_spiffs.h"
 #include "esp_log.h"
+#include "nvs_flash.h"
 
 #include "lwip/err.h"
 #include "lwip/sys.h"
@@ -45,7 +46,7 @@
 #include "myWifi.h"
 #include "status_routine.h"
 #include "infoScene.h"
-#include "my_nvs.h"
+
 
 /*********************
  *      DEFINES
@@ -117,7 +118,12 @@ void app_main()
     else ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
 
     //NVS init
-    
+    ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+      ESP_ERROR_CHECK(nvs_flash_erase());
+      ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
     //LED init
     gpio_set_direction(GPIO_NUM_32,GPIO_MODE_OUTPUT);
     gpio_set_level(GPIO_NUM_32,1);

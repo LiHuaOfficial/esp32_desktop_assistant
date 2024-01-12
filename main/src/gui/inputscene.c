@@ -1,11 +1,15 @@
 #include "inputscene.h"
 
 #include "esp_wifi.h"
+#include "nvs_flash.h"
+#include "esp_log.h"
 
 #include "lvgl.h"
 
 #include "myWifi.h"
 #include "status_routine.h"
+
+#define TAG "InputS"
 
 static void Keyboard_Wifi_Handler(lv_event_t* e);
 static void Keyboard_CityInput_Handler(lv_event_t* e);
@@ -109,6 +113,15 @@ void Keyboard_CityInput_Handler(lv_event_t* e){
                 else weatherUrl[i+96]=text[i];
             }
             xSemaphoreGive(semaphoreUrlChange);
+            //把修改写入nvs
+            nvs_handle_t nvs_handle;
+            esp_err_t err=nvs_open("nvs",NVS_READWRITE,&nvs_handle);
+            if (err!=ESP_OK)    ESP_LOGE(TAG,"nvs open fail %s",esp_err_to_name(err));
+            else{
+                err=nvs_set_str(nvs_handle,"location",text);
+                err=nvs_commit(nvs_handle);
+                nvs_close(nvs_handle);
+            }
             printf("New Url:%s\n",weatherUrl);         
             xEventGroupSetBits(eventGroup_note,ROUTINE_BIT_CITY_INPUT_SUCCESS);
         }else{
