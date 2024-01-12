@@ -24,7 +24,7 @@
 extern SemaphoreHandle_t xGuiSemaphore;
 
 
-char weatherUrl[130]="https://api.seniverse.com/v3/weather/now.json?key=SJvAOXfRZ1pDGsd3D&language=en&unit=c&location=37.75:112.72";
+char weatherUrl[130]="https://api.seniverse.com/v3/weather/now.json?key=your key here&language=en&unit=c&location=37.75:112.72";
 char nvsLoaction[16]="";
 static void Http_get_from_url();
 
