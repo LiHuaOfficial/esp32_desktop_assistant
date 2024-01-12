@@ -59,6 +59,10 @@ gpio_set_direction(XXXX_DC, GPIO_MODE_OUTPUT);
     （生成时颜色格式为CF_TRUE_COLOR_CHROMA，LVGL将不会渲染为0x0000的像素）
     + **LVGL** 启用内置字体 **Montserrat14、30、48**
     + **ESP Components** 打开ESP-TLS中的**Skip server certification**
+    + 启用GIF_DECODER
+
++ ### 首次下载
+    + 接触main目录下的spiffs_create_partition_image(storage resources FLASH_IN_PROJECT)注释
 ## 可能出现的问题
 + ### 找不到头文件
 使用idf提供的工具自动添加路径

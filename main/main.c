@@ -68,6 +68,7 @@ extern lv_indev_t* indev_touchpad;
 lv_obj_t* mainScene;
 lv_obj_t* setupScene;
 lv_obj_t* infoScene;
+lv_obj_t* inputScene;
 
 lv_fs_drv_t drv;
 // lv_group_t* group_mainScene;

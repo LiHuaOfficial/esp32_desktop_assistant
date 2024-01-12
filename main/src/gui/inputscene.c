@@ -15,7 +15,7 @@ static void Keyboard_Wifi_Handler(lv_event_t* e);
 static void Keyboard_CityInput_Handler(lv_event_t* e);
 static bool CityInput_CheckLocation(const char* str);
 
-lv_obj_t* inputScene;
+extern lv_obj_t* inputScene;
 
 extern char weatherUrl[130];//第一个location数字 index为96
 
