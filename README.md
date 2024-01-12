@@ -9,8 +9,10 @@ esp32配合lvgl实现的简单桌面助手
     + 显示天气（从心知天气获取JSON并解析）
     + 显示时间&日期（通过NTP服务器对时）
     + 基于SHT30显示室内温湿度
+    + 小豆泥的GIF
 + 设置界面
     + 连接Wifi
+    + 更改当前位置（用来获取天气）
 + 全局的消息提示
 
 
@@ -30,6 +32,9 @@ esp32配合lvgl实现的简单桌面助手
         + LEFT 19
         + RIGHT 21
         + MID 22
+    + SHT3x
+        + SCL 25
+        + SDA 26
 + ### 添加组件
 需要添加以下组件
 ```
@@ -63,7 +68,7 @@ gpio_set_direction(XXXX_DC, GPIO_MODE_OUTPUT);
     + 将LVGL分配的内存调至64kb
 
 + ### 首次下载
-    + 接触main目录下的spiffs_create_partition_image(storage resources FLASH_IN_PROJECT)注释
+    + 取消根目录下spiffs_create_partition_image(storage resources FLASH_IN_PROJECT)的注释
 ## 可能出现的问题
 + ### 找不到头文件
 使用idf提供的工具自动添加路径
