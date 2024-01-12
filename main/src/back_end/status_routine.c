@@ -19,6 +19,8 @@ extern SemaphoreHandle_t xGuiSemaphore;
 //每当需要产生可见通知时发送bit
 EventGroupHandle_t eventGroup_note;
 
+SemaphoreHandle_t semaphoreUrlChange;
+
 Common_status common_status={
     .wifi=false,
     .obj_statusBar=NULL,
@@ -33,6 +35,7 @@ void Task_MyEventHandle(void* arg);
 
 void Task_Routine(void *arg)
 {
+    semaphoreUrlChange=xSemaphoreCreateMutex();
     xTaskCreate(Task_MyEventHandle,"MyEvent",4096,NULL,configMAX_PRIORITIES,NULL);
 
     //需要定时处理的操作
@@ -78,7 +81,8 @@ void Task_MyEventHandle(void* arg){
     {
         //等待
         uint32_t bits=xEventGroupWaitBits(eventGroup_note,
-                                          ROUTINE_BIT_WIFI_SCAN_START | ROUTINE_BIT_WIFI_CONNECT_SUCCESS | ROUTINE_BIT_WIFI_CONNECT_FAILED,
+                                          ROUTINE_BIT_WIFI_SCAN_START | ROUTINE_BIT_WIFI_CONNECT_SUCCESS | ROUTINE_BIT_WIFI_CONNECT_FAILED
+                                          | ROUTINE_BIT_CITY_INPUT_INVAILD | ROUTINE_BIT_CITY_INPUT_SUCCESS,
                                           pdTRUE,
                                           pdFALSE,
                                           portMAX_DELAY);
@@ -93,6 +97,10 @@ void Task_MyEventHandle(void* arg){
         }else if(bits & ROUTINE_BIT_WIFI_CONNECT_FAILED){
             ESP_LOGI(TAG,"Wifi Connect Failed");
             Generate_NoteWidget("Wifi Connect Failed");
+        }else if(bits & ROUTINE_BIT_CITY_INPUT_INVAILD){
+            Generate_NoteWidget("Invaild Input");
+        }else if(bits & ROUTINE_BIT_CITY_INPUT_SUCCESS){
+            Generate_NoteWidget("City Changed");
         }
 
         //printf("inEvent:%lu\n",uxTaskGetStackHighWaterMark2(xTaskGetCurrentTaskHandle()));

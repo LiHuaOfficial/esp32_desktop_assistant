@@ -9,8 +9,10 @@ esp32配合lvgl实现的简单桌面助手
     + 显示天气（从心知天气获取JSON并解析）
     + 显示时间&日期（通过NTP服务器对时）
     + 基于SHT30显示室内温湿度
+    + 小豆泥的GIF
 + 设置界面
     + 连接Wifi
+    + 更改当前位置（用来获取天气）
 + 全局的消息提示
 
 
@@ -30,6 +32,9 @@ esp32配合lvgl实现的简单桌面助手
         + LEFT 19
         + RIGHT 21
         + MID 22
+    + SHT3x
+        + SCL 25
+        + SDA 26
 + ### 添加组件
 需要添加以下组件
 ```
@@ -59,37 +64,14 @@ gpio_set_direction(XXXX_DC, GPIO_MODE_OUTPUT);
     （生成时颜色格式为CF_TRUE_COLOR_CHROMA，LVGL将不会渲染为0x0000的像素）
     + **LVGL** 启用内置字体 **Montserrat14、30、48**
     + **ESP Components** 打开ESP-TLS中的**Skip server certification**
+    + 启用GIF_DECODER
+    + 将LVGL分配的内存调至64kb
+
++ ### 首次下载
+    + 取消根目录下spiffs_create_partition_image(storage resources FLASH_IN_PROJECT)的注释
 ## 可能出现的问题
 + ### 找不到头文件
-将.vscode\c_cpp_properties.json中的"compilerPath"更改为ESP-IDF build project时显示的编译器路径即可
+使用idf提供的工具自动添加路径
 ```
-{
-    "configurations": [
-        {
-            "name": "ESP-IDF",
-            "compilerPath": "D:/Applications/ESP32/.espressif/tools/xtensa-esp32-elf/esp-12.2.0_20230208/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc.exe",
-            "cStandard": "c11",
-            "cppStandard": "c++17",
-            "includePath": [
-                "${config:idf.espIdfPath}/components/**",
-                "${config:idf.espIdfPathWin}/components/**",
-                "${config:idf.espAdfPath}/components/**",
-                "${config:idf.espAdfPathWin}/components/**",
-                "${workspaceFolder}/**"
-            ],
-            "browse": {
-                "path": [
-                    "${config:idf.espIdfPath}/components",
-                    "${config:idf.espIdfPathWin}/components",
-                    "${config:idf.espAdfPath}/components/**",
-                    "${config:idf.espAdfPathWin}/components/**",
-                    "${workspaceFolder}"
-                ],
-                "limitSymbolsToIncludedHeaders": false
-            }  
-        }
-    ],
-    "version": 4
-}
-
+view->command palette->ESP-IDF:add vscode configration folder
 ```

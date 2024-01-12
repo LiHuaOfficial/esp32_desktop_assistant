@@ -117,7 +117,7 @@ void InputFeedback_Callback(lv_indev_drv_t* indev_drv,uint8_t eventType){
                 lv_obj_del(currentSubMenu);
                 currentSubMenu=NULL;
             }//防止内存泄漏！！！
-            if(inputScene!=NULL){
+            if(inputScene!=NULL){//可能没删除
                 lv_obj_del(inputScene);
                 inputScene=NULL;
             }

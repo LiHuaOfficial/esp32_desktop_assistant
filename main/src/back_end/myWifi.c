@@ -34,13 +34,7 @@ static void Handler_WifiEvent(void* arg, esp_event_base_t event_base,
 void Task_WifiInit(void* arg){
     //menuconfig中 wifi nvs flash使能时
     //主板上电/重新启动时，就不需从头开始配置 Wi-Fi 驱动程序，只需调用函数 esp_wifi_get_xxx API 获取之前存储的配置信息
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-      ESP_ERROR_CHECK(nvs_flash_erase());
-      ret = nvs_flash_init();
-    }
 
-    ESP_ERROR_CHECK(ret);
     //Wifi init
     //实现简单的连接
     ESP_ERROR_CHECK(esp_netif_init());
@@ -65,19 +59,6 @@ void Task_WifiInit(void* arg){
                                                         ));
 
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-
-    //检查flash中的wifi_config信息
-    wifi_config_t* p_cfg_wifi=NULL;
-    if(esp_wifi_get_config(WIFI_IF_STA,p_cfg_wifi)==ESP_OK){
-        //有信息则尝试连接
-        ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA,p_cfg_wifi));
-        
-
-        ESP_LOGI(TAG, "wifi_init_sta finished.");
-    }else{
-        //重新下载的话会抹除flash
-        ESP_LOGI(TAG,"no flash,not doing anything");
-    }
 
     ESP_ERROR_CHECK(esp_wifi_start());//WIFI_EVENT_STA_START 将随后产生
     

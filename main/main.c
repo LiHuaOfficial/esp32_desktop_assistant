@@ -23,6 +23,7 @@
 #include "esp_timer.h"
 #include "esp_spiffs.h"
 #include "esp_log.h"
+#include "nvs_flash.h"
 
 #include "lwip/err.h"
 #include "lwip/sys.h"
@@ -46,6 +47,7 @@
 #include "status_routine.h"
 #include "infoScene.h"
 
+
 /*********************
  *      DEFINES
  *********************/
@@ -66,6 +68,7 @@ extern lv_indev_t* indev_touchpad;
 lv_obj_t* mainScene;
 lv_obj_t* setupScene;
 lv_obj_t* infoScene;
+lv_obj_t* inputScene;
 
 lv_fs_drv_t drv;
 // lv_group_t* group_mainScene;
@@ -115,6 +118,13 @@ void app_main()
     if (ret != ESP_OK) ESP_LOGE(TAG, "Failed to get SPIFFS partition information (%s)", esp_err_to_name(ret));
     else ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
 
+    //NVS init
+    ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+      ESP_ERROR_CHECK(nvs_flash_erase());
+      ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
     //LED init
     gpio_set_direction(GPIO_NUM_32,GPIO_MODE_OUTPUT);
     gpio_set_level(GPIO_NUM_32,1);

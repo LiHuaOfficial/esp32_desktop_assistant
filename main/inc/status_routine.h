@@ -9,6 +9,7 @@ extern "C"{
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
+#include "freertos/semphr.h"
 
 #include "lvgl.h"
 
@@ -24,7 +25,8 @@ extern "C"{
 #define ROUTINE_BIT_WIFI_SCAN_START BIT0
 #define ROUTINE_BIT_WIFI_CONNECT_SUCCESS BIT1//更新主界面状态栏
 #define ROUTINE_BIT_WIFI_CONNECT_FAILED BIT2
-
+#define ROUTINE_BIT_CITY_INPUT_INVAILD BIT3
+#define ROUTINE_BIT_CITY_INPUT_SUCCESS BIT4
 typedef struct
 {   
     //连接wifi时才为true
@@ -39,6 +41,8 @@ typedef struct
 
 extern EventGroupHandle_t eventGroup_note; 
 extern Common_status common_status;
+
+extern SemaphoreHandle_t semaphoreUrlChange;
 
 void Task_Routine(void * arg);
 

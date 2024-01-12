@@ -1,15 +1,23 @@
 #include "inputscene.h"
 
 #include "esp_wifi.h"
+#include "nvs_flash.h"
+#include "esp_log.h"
 
 #include "lvgl.h"
 
 #include "myWifi.h"
+#include "status_routine.h"
+
+#define TAG "InputS"
 
 static void Keyboard_Wifi_Handler(lv_event_t* e);
 static void Keyboard_CityInput_Handler(lv_event_t* e);
+static bool CityInput_CheckLocation(const char* str);
 
-lv_obj_t* inputScene;
+extern lv_obj_t* inputScene;
+
+extern char weatherUrl[130];//第一个location数字 index为96
 
 void InputScene_Show(input_cb_type cb_type,void* p)
 {   
@@ -75,11 +83,13 @@ void Keyboard_Wifi_Handler(lv_event_t* e)
         MyWifi_Connect(false,lv_label_get_text(ssidLabel),lv_textarea_get_text(textArea));
 
         lv_obj_fade_out(wifi_widget,500,100);
-        lv_obj_del(wifi_widget); 
+        lv_obj_del(wifi_widget);
+        inputScene=NULL;//防止被重新释放 
     }else if(code==LV_EVENT_CANCEL){
         //退出按下
         lv_obj_fade_out(wifi_widget,500,100);
-        lv_obj_del(wifi_widget);    
+        lv_obj_del(wifi_widget);
+        inputScene=NULL;    
     }
 }
 
@@ -93,12 +103,52 @@ void Keyboard_CityInput_Handler(lv_event_t* e){
     if(code==LV_EVENT_READY){
         //Enter按下
         //检测输入正确性&修改经纬度
-
+        const char* text=lv_textarea_get_text(textArea);
+        if(CityInput_CheckLocation(text)){
+            //修改weatherUrl
+            xSemaphoreTake(semaphoreUrlChange,portMAX_DELAY);
+            for (int i = 0; i <= strlen(text); i++)
+            {
+                if(i==strlen(text)) weatherUrl[i+96]='\0';
+                else weatherUrl[i+96]=text[i];
+            }
+            xSemaphoreGive(semaphoreUrlChange);
+            //把修改写入nvs
+            nvs_handle_t nvs_handle;
+            esp_err_t err=nvs_open("nvs",NVS_READWRITE,&nvs_handle);
+            if (err!=ESP_OK)    ESP_LOGE(TAG,"nvs open fail %s",esp_err_to_name(err));
+            else{
+                err=nvs_set_str(nvs_handle,"location",text);
+                err=nvs_commit(nvs_handle);
+                nvs_close(nvs_handle);
+            }
+            printf("New Url:%s\n",weatherUrl);         
+            xEventGroupSetBits(eventGroup_note,ROUTINE_BIT_CITY_INPUT_SUCCESS);
+        }else{
+            xEventGroupSetBits(eventGroup_note,ROUTINE_BIT_CITY_INPUT_INVAILD);
+        }
         lv_obj_fade_out(widget,500,100);
-        lv_obj_del(widget); 
+        lv_obj_del(widget);
+        inputScene=NULL;
     }else if(code==LV_EVENT_CANCEL){
         //退出按下
         lv_obj_fade_out(widget,500,100);
-        lv_obj_del(widget);    
+        lv_obj_del(widget); 
+        inputScene=NULL;   
     }
+}
+
+//不合法则返回0,其余情况返回结尾位置 
+bool CityInput_CheckLocation(const char* str){
+    int num1,num2,num3,num4;
+    if(sscanf(str,"%d.%d:%d.%d",&num1,&num2,&num3,&num4)==4){
+        if(0<=num1 && num1<=90){//纬度 在0-90度
+            if(0<=num2 && num2<=99 && 0<=num4 && num4<=99){//小数范围有限
+                if(0<=num3 && num3<=180){//经度 0-180 
+                    return true;
+                }
+            }
+        }        
+    }
+    return false;
 }
