@@ -22,6 +22,9 @@
 
 extern SemaphoreHandle_t xGuiSemaphore;
 
+
+char weatherUrl[130]="https://api.seniverse.com/v3/weather/now.json?key=SJvAOXfRZ1pDGsd3D&language=en&unit=c&location=37.75:112.72";
+
 static void Http_get_from_url();
 
 void Task_Http(void* arg)
@@ -40,13 +43,16 @@ void Http_get_from_url()
 {
     char response_buffer[HTTP_OUT_PUT_BUFFER_SIZE];
     /*流方法CPU占用低了5%左右,且不会在get_status_code时莫名其妙崩溃！！！*/
+
     esp_http_client_config_t cfg_http_client={
-        .url="https://api.seniverse.com/v3/weather/now.json?key=SJvAOXfRZ1pDGsd3D&location=37.75:112.72&language=en&unit=c",
+        .url=weatherUrl,
         //.event_handler=Event_Handler_Http,
         //.user_data=response_buffer,
         //.disable_auto_redirect=true,
     };
+    xSemaphoreTake(semaphoreUrlChange,portMAX_DELAY);
     esp_http_client_handle_t handle_http_client=esp_http_client_init(&cfg_http_client);
+    xSemaphoreGive(semaphoreUrlChange);
     esp_http_client_set_method(handle_http_client,HTTP_METHOD_GET);
     
     int64_t contentLenth=0;

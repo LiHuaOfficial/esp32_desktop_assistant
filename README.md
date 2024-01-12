@@ -61,35 +61,7 @@ gpio_set_direction(XXXX_DC, GPIO_MODE_OUTPUT);
     + **ESP Components** 打开ESP-TLS中的**Skip server certification**
 ## 可能出现的问题
 + ### 找不到头文件
-将.vscode\c_cpp_properties.json中的"compilerPath"更改为ESP-IDF build project时显示的编译器路径即可
+使用idf提供的工具自动添加路径
 ```
-{
-    "configurations": [
-        {
-            "name": "ESP-IDF",
-            "compilerPath": "D:/Applications/ESP32/.espressif/tools/xtensa-esp32-elf/esp-12.2.0_20230208/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc.exe",
-            "cStandard": "c11",
-            "cppStandard": "c++17",
-            "includePath": [
-                "${config:idf.espIdfPath}/components/**",
-                "${config:idf.espIdfPathWin}/components/**",
-                "${config:idf.espAdfPath}/components/**",
-                "${config:idf.espAdfPathWin}/components/**",
-                "${workspaceFolder}/**"
-            ],
-            "browse": {
-                "path": [
-                    "${config:idf.espIdfPath}/components",
-                    "${config:idf.espIdfPathWin}/components",
-                    "${config:idf.espAdfPath}/components/**",
-                    "${config:idf.espAdfPathWin}/components/**",
-                    "${workspaceFolder}"
-                ],
-                "limitSymbolsToIncludedHeaders": false
-            }  
-        }
-    ],
-    "version": 4
-}
-
+view->command palette->ESP-IDF:add vscode configration folder
 ```

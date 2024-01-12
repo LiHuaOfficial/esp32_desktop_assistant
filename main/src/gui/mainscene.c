@@ -64,7 +64,7 @@ void MainScene_Create(void){
     lv_obj_t* label_placeStatus=lv_label_create(common_status.obj_statusBar);
     lv_label_set_text(label_placeStatus,"None");
     lv_label_set_long_mode(label_placeStatus,LV_LABEL_LONG_SCROLL_CIRCULAR);
-    lv_obj_set_width(label_placeStatus,40);
+    lv_obj_set_width(label_placeStatus,60);
     lv_obj_align_to(label_placeStatus,label_placeLogo,LV_ALIGN_OUT_RIGHT_MID,0,0);
     //时间框
     obj_time=lv_obj_create(mainScene);

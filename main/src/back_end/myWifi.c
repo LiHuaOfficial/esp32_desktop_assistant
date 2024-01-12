@@ -66,19 +66,6 @@ void Task_WifiInit(void* arg){
 
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
 
-    //检查flash中的wifi_config信息
-    wifi_config_t* p_cfg_wifi=NULL;
-    if(esp_wifi_get_config(WIFI_IF_STA,p_cfg_wifi)==ESP_OK){
-        //有信息则尝试连接
-        ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA,p_cfg_wifi));
-        
-
-        ESP_LOGI(TAG, "wifi_init_sta finished.");
-    }else{
-        //重新下载的话会抹除flash
-        ESP_LOGI(TAG,"no flash,not doing anything");
-    }
-
     ESP_ERROR_CHECK(esp_wifi_start());//WIFI_EVENT_STA_START 将随后产生
     
     //printf("inWifiInit:%lu\n",uxTaskGetStackHighWaterMark2(xTaskGetCurrentTaskHandle()));

@@ -117,10 +117,12 @@ void InputFeedback_Callback(lv_indev_drv_t* indev_drv,uint8_t eventType){
                 lv_obj_del(currentSubMenu);
                 currentSubMenu=NULL;
             }//防止内存泄漏！！！
-            if(inputScene!=NULL){
-                lv_obj_del(inputScene);
-                inputScene=NULL;
-            }
+
+            //回调结束后自动删除
+            // if(inputScene!=NULL){
+            //     lv_obj_del(inputScene);
+            //     inputScene=NULL;
+            // }
             lv_scr_load_anim(mainScene,LV_SCR_LOAD_ANIM_FADE_ON,500,100,false);
             lv_obj_set_parent(common_status.obj_statusBar,mainScene);
         }
