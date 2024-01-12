@@ -15,6 +15,9 @@ esp32配合lvgl实现的简单桌面助手
     + 更改当前位置（用来获取天气）
 + 全局的消息提示
 
+效果图：
+![IMG_20240112_191655](https://github.com/LiHuaOfficial/esp32_desktop_assistant/assets/120998712/e37ec27e-a9d1-42de-b901-d0d3637c8424)
+
 
 ## 如何使用
 
